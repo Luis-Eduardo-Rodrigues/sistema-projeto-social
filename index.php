@@ -23,22 +23,25 @@
     </header>
     <main class="w-full flex items-center justify-center flex-col gap-12">
         <div>
-            <p class="font-bold text-[#357950] mt-12 text-2xl">SISTEMA DE CONTROLE DO “BOLSA ESTUDANTE CRATÉUS” - PÉ DE MEIA MUNICIPAL</p>
+            <p class="font-bold text-black mt-12 text-2xl">SISTEMA DE CONTROLE DO “BOLSA ESTUDANTE CRATÉUS” - PÉ DE MEIA MUNICIPAL</p>
         </div>
         <div class="flex items-center gap-32">
-            <div class="flex items-center justify-center flex-col gap-2 cursor-pointer" onclick="mostrarModalSecretaria()">
-                <div class=" border border-2 border-[#459f6a] p-2">
-                    <img src="./src/user-icon.jpg" alt="Icone de Usuario" class="w-40 cursor-pointer">
-                </div>
-                <p class="font-bold text-[#357950] cursor-pointer">SECRETARÍA DE EDUCAÇÃO</p>
-            </div>
-            <div class="flex items-center justify-center flex-col gap-2 cursor-pointer" onclick="mostrarModalCoordenador()">
-                <div class=" border border-2 border-[#459f6a] p-2">
-                    <img src="./src/user-icon.jpg" alt="Icone de Usuario" class="w-40 cursor-pointer">
-                </div>
-                <p class="font-bold text-[#357950] cursor-pointer">COORDERNADOR(A)</p>
-            </div>
+    <div class="flex items-center justify-center flex-col gap-2 cursor-pointer group" onclick="mostrarModalSecretaria()" id="modalSecretariaBtn">
+        <div class="w-[300px] border-2 border-[#459f6a] rounded-xl p-2 flex items-center justify-center flex-col gap-2 transition-colors duration-300 
+                    hover:bg-[#357950]">
+            <i class="fa-solid fa-user text-9xl text-[#357950] group-hover:text-white transition-colors duration-300"></i>
+            <p class="font-bold text-[#357950] group-hover:text-white transition-colors duration-300">SECRETARIA DE EDUCAÇÃO</p>
         </div>
+    </div>
+    <div class="flex items-center justify-center flex-col gap-2 cursor-pointer group" onclick="mostrarModalCoordenador()" id="modalCoordenadorBtn">
+        <div class="w-[300px] border-2 border-[#459f6a] rounded-xl p-2 flex items-center justify-center flex-col gap-2 transition-colors duration-300 
+                    hover:bg-[#357950]">
+            <i class="fa-solid fa-user text-9xl text-[#357950] group-hover:text-white transition-colors duration-300"></i>
+            <p class="font-bold text-[#357950] group-hover:text-white transition-colors duration-300">COORDENADOR(A)</p>
+        </div>
+    </div>
+</div>
+
     </main>
     <footer class="w-full flex items-center py-2 justify-around mt-24 border-t-2 border-[#357950]">
         <div>
@@ -62,12 +65,10 @@
             <h2 class="text-2xl font-bold text-white">LOGIN</h2>
             <button onclick="fecharModalCoordenador()">X</button>
         </div>
-        <input type="text" class="w-48 border-1 rounded-md" placeholder="Usuario">
-        <input type="password" class="w-48 border-1 rounded-md" placeholder="Senha">
-        <select name="" id="">
+        <input type="text" class="w-48 border-1 rounded-md" placeholder="Usuario" name="usuario">
+        <input type="password" class="w-48 border-1 rounded-md" placeholder="Senha" name="senha">
+        <select name="escola" id="escola">
             <option value="">Escolha sua escola</option>
-            <option value="Olavo Bilac">Olavo Bilac</option>
-            <option value="Vilebaldo">Vilebaldo</option>
         </select>
         <button class="p-2 bg-purple-600 text-white">Entrar</button>
     </section>
@@ -77,8 +78,8 @@
             <h2 class="text-2xl font-bold text-white">LOGIN</h2>
             <button onclick="fecharModalSecretaria()">X</button>
         </div>
-        <input type="text" class="w-48 border-1 rounded-md" placeholder="Usuario">
-        <input type="password" class="w-48 border-1 rounded-md" placeholder="Senha">
+        <input type="text" class="w-48 border-1 rounded-md" placeholder="Usuario" name="usuario">
+        <input type="password" class="w-48 border-1 rounded-md" placeholder="Senha" name="senha">
         <button class="p-2 bg-purple-600 text-white">Entrar</button>
     </section>
 
