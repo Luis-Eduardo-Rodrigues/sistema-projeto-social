@@ -1,3 +1,85 @@
+<?php
+include "conn.php";
+
+if (isset($_POST['usuario_c']) || isset($_POST['senha_c'])) {
+        
+        if(strlen($_POST['usuario_c']) == 0){
+            echo "<script> alert('Preencha seu usuário!') </script>";
+        }else if(strlen($_POST['senha_c']) == 0){
+            echo "<script> alert('Preencha sua senha!') </script>";
+        }else{
+            
+            $usuario_c = $mysqli->real_escape_string($_POST['usuario_c']);
+            $senha_c = $mysqli->real_escape_string($_POST['senha_c']);
+            $escola_c = $mysqli->real_escape_string($_POST['escola']);
+
+            $sql_code = "SELECT * FROM usuario WHERE usuario = '$usuario_c' LIMIT 1";
+            $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
+
+            $usuario = $sql_query->fetch_assoc();
+
+            if(password_verify($senha_c ,$usuario['senha'])){
+                
+
+                if(!isset($_SESSION)){
+                    session_start();
+                }
+
+                
+                if($escola_c == $usuario['nome_escola']){
+                    $_SESSION['escola'] = $usuario['nome_escola'];
+                    $_SESSION['nome_coordenador'] = $usuario['nome_usuario'];
+                    header("Location: coordenador.php");
+                }else{
+                    echo "<script> alert('Falha ao logar! Dados incorretos') </script>";
+                }
+                
+
+                
+
+            }else{
+                echo "<script> alert('Falha ao logar! Dados incorretos') </script>";
+            }
+        }
+
+    }
+
+if(isset($_POST['usuario_s']) AND isset($_POST['senha_s'])){
+    if(strlen($_POST['usuario_s']) == 0){
+        echo "<script> alert('Preencha o campo de usuário.') </script>";
+    }else if(strlen($_POST['senha_s']) == 0){
+        echo "<script>alert('Preencha o campo de senha.')</script>";
+    } else{
+
+        $nome_secretario = $mysqli->real_escape_string($_POST['usuario_s']);
+        $senha_secretario = $mysqli->real_escape_string($_POST['senha_s']);
+
+        $consulta_sql = "SELECT * FROM usuario WHERE usuario = '$nome_secretario' LIMIT 1";
+        $execucao_sql = $mysqli->query($consulta_sql) or die("Falha no código SQL.");
+
+        $usuario = $execucao_sql->fetch_assoc();
+        
+        if(password_verify($senha_secretario, $usuario['senha'])){
+
+            if(!isset($_SESSION)){
+                session_start();
+            }
+            $_SESSION['nome_secretario'] = $usuario['usuario'];
+            $_SESSION['senha_secretario'] = $usuario['senha'];
+
+            header("Location: secretaria.php");
+        }else{
+            echo "<script>alert('Usuario ou senha incorretos.')</script>";
+        }
+
+
+
+    }
+
+}
+
+
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -6,6 +88,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Página Inicial - Sistema de Controle</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="icon" href="src/projeto.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha512-DxV+EoADOkOygM4IR9yXP8Sb2qwgidEmeqAEmDKIOfPRQZOWbXCzLC6vjbZyy0vPisbH2SyW27+ddLVCN+OMzQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -63,50 +146,69 @@
 
     <!--coordenador-->
     <section class="flex items-center flex-col gap-6 p-4 absolute top-50 left-150 w-72 hidden" id="modalCoordenador">
-        <div class="w-80 bg-[#5cd65c] rounded-md ">
-        <h2 class="text-lg font-bold text-center mb-4 text-white">LOGIN</h2>
+        <form action="" method="post">
+            <div class="w-80 bg-[#5cd65c] rounded-md ">
+                <h2 class="text-lg font-bold text-center mb-4 text-white">LOGIN</h2>
 
-        <div class="bg-[#5cd65c] shadow-md  p-4 space-y-4" >
-            <label for="usuario" class="block text-sm text-white mb-1">Usuário</label>
-            <input id="usuario" type="text" class="shadow-lg w-full bg-gray-50 border border-white rounded-md ">
-        </div>
+                <div class="bg-[#5cd65c] shadow-md  p-4 space-y-4" >
+                    <label for="usuario" class="block text-sm text-white mb-1">Usuário</label>
+                    <input id="usuario" name="usuario_c" type="text" class="shadow-lg w-full bg-gray-50 border border-white rounded-md ">
+                </div>
 
-         <div class="bg-[#5cd65c] shadow-md p-4">
-            <label for="senha" class="block text-sm text-white mb-1">Senha</label>
-            <input id="senha" type="text" class="shadow-lg w-full bg-gray-50 border border-white rounded-md ">
-        </div>
+                <div class="bg-[#5cd65c] shadow-md p-4">
+                    <label for="senha" class="block text-sm text-white mb-1">Senha</label>
+                    <input id="senha" name="senha_c" type="text" class="shadow-lg w-full bg-gray-50 border border-white rounded-md ">
+                </div>
 
-         <div class=" bg-[#5cd65c] shadow-md p-4">
-            <select name="escola" id="escola" class="block text-sm text-white mb-1">
-            <option value="" class="shadow-lg w-full bg-gray-50 border border-white rounded-md">Escolha sua escola</option>
-        </select>
-        </div>
+                <div class=" bg-[#5cd65c] shadow-md p-4">
+                    <select name="escola" id="escola" class="block text-sm text-white mb-1">
+                    <option value="" class="shadow-lg w-full bg-gray-50 border border-white rounded-md">Escolha sua escola</option>
+                     <?php
+                        $sql = "SELECT * FROM escola";
+                        $escolas = mysqli_query($mysqli, $sql);
+                        foreach($escolas as $escola){
+                    ?>
+                    
+                    
+                    <option value="<?=$escola['nome_escola']?>" class="shadow-lg text-black w-full bg-gray-50 border border-white rounded-md"><?=$escola['nome_escola']?></option>
+                    <?php
+                        }
+                    ?>
+                </select>
+                </div>
 
-        <div class="text-right ">
-            <button class="w-full text-sm bg[#1e7b1e] hover:bg-green-600 px-5 rounded-md p-2 text-white font-bold">Entrar</button>
-        </div>
-    </div>
+                <div class="text-right ">
+                    <button type="submit" class="w-full text-sm bg[#1e7b1e] hover:bg-green-600 px-5 rounded-md p-2 text-white font-bold">Entrar</button>
+                </div>
+            </div>
+        
+        </form>        
+        
     
     </section>
 
     <!--secretaria-->
      <section class="flex items-center flex-col gap-6 p-4 absolute top-50 left-150 w-72 hidden" id="modalSecretaria">
-        <div class="w-80 bg-[#5cd65c] rounded-md ">
-        <h2 class="text-lg font-bold text-center mb-4 text-white">LOGIN</h2>
+        <form action="" method="post">
+            <div class="w-80 bg-[#5cd65c] rounded-md ">
+            <h2 class="text-lg font-bold text-center mb-4 text-white">LOGIN</h2>
 
-        <div class="bg-[#5cd65c] shadow-md  p-4 space-y-4" >
-            <label for="usuario" class="block text-sm text-white mb-1">Usuário</label>
-            <input id="usuario" type="text" class="shadow-lg w-full bg-gray-50 border border-white rounded-md ">
-        </div>
+            <div class="bg-[#5cd65c] shadow-md  p-4 space-y-4" >
+                <label for="usuario" class="block text-sm text-white mb-1">Usuário</label>
+                <input id="usuario" name="usuario_s" type="text" class="shadow-lg w-full bg-gray-50 border border-white rounded-md ">
+            </div>
 
-         <div class="bg-[#5cd65c] shadow-md p-4">
-            <label for="senha" class="block text-sm text-white mb-1">Senha</label>
-            <input id="senha" type="text" class="shadow-lg w-full bg-gray-50 border border-white rounded-md ">
-        </div>
+            <div class="bg-[#5cd65c] shadow-md p-4">
+                <label for="senha" class="block text-sm text-white mb-1">Senha</label>
+                <input id="senha" name="senha_s" type="text" class="shadow-lg w-full bg-gray-50 border border-white rounded-md ">
+            </div>
 
-        <div class="text-right ">
-            <button class="w-full text-sm bg[#1e7b1e] hover:bg-green-600 px-5 rounded-md p-2 text-white font-bold">Entrar</button>
-        </div>
+            <div class="text-right ">
+                <button type="submit" class="w-full text-sm bg[#1e7b1e] hover:bg-green-600 px-5 rounded-md p-2 text-white font-bold">Entrar</button>
+            </div>
+
+        </form>
+        
     </div>
     
     </section>
