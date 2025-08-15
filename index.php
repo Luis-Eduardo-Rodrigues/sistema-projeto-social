@@ -15,25 +15,31 @@ include "conn.php";
 
             $sql_code = "SELECT * FROM usuario WHERE usuario = '$usuario_c' LIMIT 1";
             $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
+            if($sql_query->num_rows > 0){
+                 $usuario = $sql_query->fetch_assoc();
 
-            $usuario = $sql_query->fetch_assoc();
+                if(password_verify($senha_c ,$usuario['senha'])){
+                    if(!isset($_SESSION)){
+                        session_start();
+                    }
+                    
+                    if($escola_c == $usuario['nome_escola']){
+                        $_SESSION['escola'] = $usuario['nome_escola'];
+                        $_SESSION['nome_coordenador'] = $usuario['nome_usuario'];
+                        header("Location: coordenador.php");
+                    }else{
+                        echo "<script> alert('Falha ao logar! Dados incorretos') </script>";
+                        session_destroy();
+                    } 
 
-            if(password_verify($senha_c ,$usuario['senha'])){
-                if(!isset($_SESSION)){
-                    session_start();
-                }
-                
-                if($escola_c == $usuario['nome_escola']){
-                    $_SESSION['escola'] = $usuario['nome_escola'];
-                    $_SESSION['nome_coordenador'] = $usuario['nome_usuario'];
-                    header("Location: coordenador.php");
                 }else{
                     echo "<script> alert('Falha ao logar! Dados incorretos') </script>";
-                } 
-
+                    
+                }
             }else{
                 echo "<script> alert('Falha ao logar! Dados incorretos') </script>";
             }
+           
         }
 
     }
@@ -51,20 +57,27 @@ if(isset($_POST['usuario_s']) AND isset($_POST['senha_s'])){
         $consulta_sql = "SELECT * FROM usuario WHERE usuario = '$nome_secretario' LIMIT 1";
         $execucao_sql = $mysqli->query($consulta_sql) or die("Falha no código SQL.");
 
-        $usuario = $execucao_sql->fetch_assoc();
+        if($execucao_sql->num_rows > 0){
+            $usuario = $execucao_sql->fetch_assoc();
         
-        if(password_verify($senha_secretario, $usuario['senha'])){
+            if(password_verify($senha_secretario, $usuario['senha'])){
 
-            if(!isset($_SESSION)){
-                session_start();
+                if(!isset($_SESSION)){
+                    session_start();
+                }
+                $_SESSION['nome_secretario'] = $usuario['usuario'];
+                $_SESSION['senha_secretario'] = $usuario['senha'];
+
+                header("Location: secretaria.php");
+            }else{
+                echo "<script>alert('Usuario ou senha incorretos.')</script>";
             }
-            $_SESSION['nome_secretario'] = $usuario['usuario'];
-            $_SESSION['senha_secretario'] = $usuario['senha'];
 
-            header("Location: secretaria.php");
         }else{
-            echo "<script>alert('Usuario ou senha incorretos.')</script>";
+            echo "<script> alert('Falha ao logar! Dados incorretos') </script>";
         }
+
+        
     }
 }
 ?> 

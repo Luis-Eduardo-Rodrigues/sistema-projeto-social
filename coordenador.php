@@ -1,6 +1,29 @@
 <?php
     include "protectc.php";
     require "conn.php";
+
+    
+
+    $escola_c = $_SESSION['escola'];
+   
+
+    $query_count_alunos = "SELECT COUNT(*) FROM aluno WHERE nome_escola = '$escola_c'";
+    $query_count_alunos_exec = $mysqli->query($query_count_alunos) or die($mysqli->error);
+    $sql_count_alunos = $query_count_alunos_exec->fetch_assoc();
+    $count_alunos = $sql_count_alunos['COUNT(*)'];
+
+    $pagina = $_GET['pagina'] ? intval($_GET['pagina']) : 1;
+    $limit = 10;
+    $offset = ($pagina - 1) * $limit;
+
+    $numero_pagina = ceil($count_alunos / $limit);
+
+    $query_alunos = "SELECT * FROM aluno WHERE nome_escola = '$escola_c' ORDER BY nome_aluno ASC LIMIT {$limit} OFFSET {$offset}";
+    $query_alunos_exec = $mysqli->query($query_alunos) or die($mysqli->error);
+
+    $query_escola = "SELECT * FROM escola WHERE nome_escola = 'Vilebaldo'";
+    $query_escola_exec = $mysqli->query($query_escola) or die($mysqli->error);
+    $escola = $query_escola_exec->fetch_assoc();
 ?>
 
 <!DOCTYPE html>
@@ -29,9 +52,9 @@
 
     <main class="my-12 flex items-center justify-center flex-col gap-6">
         <section class="bg-[linear-gradient(100deg,rgba(75,172,114,1)_80%,rgba(243,225,114,1)_100%)] w-[90%] p-6 rounded-md flex flex-col gap-6">
-            <div class="text-xl text-white font-bold">Escola: <span class="font-normal">Escola de Cidadania Olavo Bilac</span></div>
-            <div class="text-xl text-white font-bold">Endereço: <span class="font-normal">Av. Sargento Hermínio</span></div>
-            <div class="text-xl text-white font-bold">Total de Alunos: <span class="font-normal">230</span></div>
+            <div class="text-xl text-white font-bold">Escola: <span class="font-normal"><?= $escola['nome_escola'] ?></span></div>
+            <div class="text-xl text-white font-bold">Endereço: <span class="font-normal"><?= $escola['endereco_escola']?></span></div>
+            <div class="text-xl text-white font-bold">Total de Alunos: <span class="font-normal"><?= $escola['qtd_alunos'] ?></span></div>
         </section>
 
         <section class="flex justify-center mt-6 w-[70%]">
@@ -44,32 +67,40 @@
                                 <th class="p-4 text-left">CPF</th>
                                 <th class="p-4 text-left">MÉDIA</th>
                                 <th class="p-4 text-left">FREQUÊNCIA</th>
+                                <th class="p-4 text-left">AÇÕES</th>
                             </tr>
                         </thead>
                         <tbody>
+                            <?php
+                                while ($aluno = $query_alunos_exec->fetch_assoc()) {
+                                    # code...
+                                
+                            ?>
                             <tr class="border-b hover:bg-green-50">
-                                <td class="p-4 cursor-pointer">*********</td>
-                                <td class="p-4">000.000.000-00</td>
+                                <td class="p-4 cursor-pointer"><?= $aluno['nome_aluno'] ?></td>
+                                <td class="p-4"><?= $aluno['cpf_aluno'] ?></td>
                                 <td class="p-4">
                                     <input type="text" class="border border-green-500 rounded-full px-3 py-2 w-24 text-center focus:outline-none" placeholder="0.0" />
                                 </td>
                                 <td class="p-4">
                                     <input type="text" class="border border-green-500 rounded-full px-3 py-2 w-24 text-center focus:outline-none" placeholder="0%" />
                                 </td>
-                            </tr>
-                            <tr class="border-b hover:bg-green-50">
-                                <td class="p-4 cursor-pointer">*********</td>
-                                <td class="p-4">000.000.000-00</td>
                                 <td class="p-4">
-                                    <input type="text" name="" class="border border-green-500 rounded-full px-3 py-2 w-24 text-center focus:outline-none" placeholder="0.0" />
-                                </td>
-                                <td class="p-4">
-                                    <input type="text" class="border border-green-500 rounded-full px-3 py-2 w-24 text-center focus:outline-none" placeholder="0%" />
+                                    <button class="bg-green-700 text-white font-bold px-4 py-2 rounded cursor-pointer">Salvar</button>
                                 </td>
                             </tr>
+                            <?php
+                                }
+                            ?>
                         </tbody>
                     </table>
                     <div class="flex justify-center gap-2 my-4">
+                        <?php
+                            for($p=1;$p<=$numero_pagina;$p++){
+                                echo "<a href='?pagina={$p}'>[{$p}]</a>";
+
+                            }
+                        ?>
                         <button class="w-10 h-10 rounded-full border border-green-800 bg-green-800 text-white font-bold">1</button>
                         <button class="w-10 h-10 rounded-full border border-green-800 text-green-800 font-bold">2</button>
                         <button class="w-10 h-10 rounded-full border border-green-800 text-green-800 font-bold">3</button>
