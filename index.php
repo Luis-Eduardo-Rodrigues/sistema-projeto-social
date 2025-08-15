@@ -26,6 +26,8 @@ include "conn.php";
                     if($escola_c == $usuario['nome_escola']){
                         $_SESSION['escola'] = $usuario['nome_escola'];
                         $_SESSION['nome_coordenador'] = $usuario['nome_usuario'];
+                        $_SESSION['bimestre'] = $usuario['bimestre'];
+                        $_SESSION['id_usuario'] = $usuario['id_usuario'];
                         header("Location: coordenador.php");
                     }else{
                         echo "<script> alert('Falha ao logar! Dados incorretos') </script>";

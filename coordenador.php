@@ -11,8 +11,13 @@
     $query_count_alunos_exec = $mysqli->query($query_count_alunos) or die($mysqli->error);
     $sql_count_alunos = $query_count_alunos_exec->fetch_assoc();
     $count_alunos = $sql_count_alunos['COUNT(*)'];
-
-    $pagina = $_GET['pagina'] ? intval($_GET['pagina']) : 1;
+    
+    if(!isset($_GET['pagina'])){
+        $pagina = 1;
+    }else{
+        $pagina = $_GET['pagina'] ? intval($_GET['pagina']) : 1;
+    }
+    
     $limit = 10;
     $offset = ($pagina - 1) * $limit;
 
@@ -21,9 +26,84 @@
     $query_alunos = "SELECT * FROM aluno WHERE nome_escola = '$escola_c' ORDER BY nome_aluno ASC LIMIT {$limit} OFFSET {$offset}";
     $query_alunos_exec = $mysqli->query($query_alunos) or die($mysqli->error);
 
-    $query_escola = "SELECT * FROM escola WHERE nome_escola = 'Vilebaldo'";
+    $query_escola = "SELECT * FROM escola WHERE nome_escola = '$escola_c'";
     $query_escola_exec = $mysqli->query($query_escola) or die($mysqli->error);
     $escola = $query_escola_exec->fetch_assoc();
+
+    if (isset($_POST['alterar_bimestre'])) {
+        $bimestrenovo = $_SESSION['bimestre'] + 1;
+        echo "<script> alert('$bimestrenovo') </script>";
+        $id_usuario = $_SESSION['id_usuario'];
+        $sql = "UPDATE usuario SET bimestre = $bimestrenovo WHERE id_usuario = $id_usuario";
+        $sql_query = $mysqli->query($sql) or die("Falha na execução do código SQL: " . $mysqli->error);
+        $_SESSION['bimestre'] = $bimestrenovo;
+    }
+
+
+
+    if(isset($_POST["add_media_frequencia"])){
+        $id_aluno = $_POST["add_media_frequencia"];
+        $media = $_POST[$id_aluno];
+        $frequencia = $_POST[$id_aluno . "2"];
+
+        if ($_SESSION['bimestre'] == 1) {
+            $sql = "UPDATE aluno SET media_1 = $media, frequencia_1 = $frequencia WHERE id_aluno = $id_aluno";
+            mysqli_query($mysqli, $sql);
+        
+            if(mysqli_affected_rows($mysqli) > 0){
+                    echo "<script> alert('Aluno atualizado!') </script>";
+                    header("Location: coordenador.php");
+                    exit;
+            }else{
+                    echo "<script> alert('Aluno não atualizado!') </script>";
+                    header("Location: coordenador.php");
+                    exit;
+            }
+        }elseif ($_SESSION["bimestre"] == 2) {
+            $sql = "UPDATE aluno SET media_2 = $media, frequencia_2 = $frequencia WHERE id_aluno = $id_aluno";
+            mysqli_query($mysqli, $sql);
+        
+            if(mysqli_affected_rows($mysqli) > 0){
+                    echo "<script> alert('Aluno atualizado!') </script>";
+                    header("Location: coordenador.php");
+                    exit;
+            }else{
+                    echo "<script> alert('Aluno não atualizado!') </script>";
+                    header("Location: coordenador.php");
+                    exit;
+            }
+        }elseif ($_SESSION["bimestre"] == 3) {
+            $sql = "UPDATE aluno SET media_3 = $media, frequencia_3 = $frequencia WHERE id_aluno = $id_aluno";
+            mysqli_query($mysqli, $sql);
+        
+            if(mysqli_affected_rows($mysqli) > 0){
+                    echo "<script> alert('Aluno atualizado!') </script>";
+                    header("Location: coordenador.php");
+                    exit;
+            }else{
+                    echo "<script> alert('Aluno não atualizado!') </script>";
+                    header("Location: coordenador.php");
+                    exit;
+            }
+        }elseif ($_SESSION["bimestre"] == 4) {
+            $sql = "UPDATE aluno SET media_4 = $media, frequencia_4 = $frequencia WHERE id_aluno = $id_aluno";
+            mysqli_query($mysqli, $sql);
+        
+            if(mysqli_affected_rows($mysqli) > 0){
+                    echo "<script> alert('Aluno atualizado!') </script>";
+                    header("Location: coordenador.php");
+                    exit;
+            }else{
+                    echo "<script> alert('Aluno não atualizado!') </script>";
+                    header("Location: coordenador.php");
+                    exit;
+            }
+        }
+
+        
+
+
+    }
 ?>
 
 <!DOCTYPE html>
@@ -78,22 +158,25 @@
                             <tr class="border-b hover:bg-green-50">
                                 <td class="p-4 cursor-pointer"><?= $aluno['nome_aluno'] ?></td>
                                 <td class="p-4"><?= $aluno['cpf_aluno'] ?></td>
-                                <td class="p-4">
-                                    <input type="text" class="border border-green-500 rounded-full px-3 py-2 w-24 text-center focus:outline-none" placeholder="0.0" />
-                                </td>
-                                <td class="p-4">
-                                    <input type="text" class="border border-green-500 rounded-full px-3 py-2 w-24 text-center focus:outline-none" placeholder="0%" />
-                                </td>
-                                <td class="p-4">
-                                    <button class="bg-green-700 text-white font-bold px-4 py-2 rounded cursor-pointer">Salvar</button>
-                                </td>
+                                <form action="" method="post">
+                                    <td class="p-4">
+                                        <input type="text" name="<?=$aluno['id_aluno']?>" class="border border-green-500 rounded-full px-3 py-2 w-24 text-center focus:outline-none" placeholder="0.0" />
+                                    </td>
+                                    <td class="p-4">
+                                        <input type="text" name="<?=$aluno['id_aluno'] . "2"?>" class="border border-green-500 rounded-full px-3 py-2 w-24 text-center focus:outline-none" placeholder="0%" />
+                                    </td>
+                                    <td class="p-4">
+                                        <button class="bg-green-700 text-white font-bold px-4 py-2 rounded cursor-pointer" name="add_media_frequencia" value="<?=$aluno['id_aluno'];?>" >Salvar</button>
+                                    </td>
+                                </form>
+                                
                             </tr>
                             <?php
                                 }
                             ?>
                         </tbody>
                     </table>
-                    <div class="flex justify-center gap-2 my-4">
+                    <div class="flex justify-center gap-2 my-4 relative">
                         <?php
                             for($p=1;$p<=$numero_pagina;$p++){
                                 echo "<a href='?pagina={$p}'>[{$p}]</a>";
@@ -104,6 +187,10 @@
                         <button class="w-10 h-10 rounded-full border border-green-800 text-green-800 font-bold">2</button>
                         <button class="w-10 h-10 rounded-full border border-green-800 text-green-800 font-bold">3</button>
                         <button class="w-10 h-10 rounded-full border border-green-800 text-green-800 font-bold">4</button>
+                        <form action="" method="post">
+                            <button type="submit" class="px-4 py-2 rounded text-white font-bold bg-green-700 absolute right-4" name="alterar_bimestre">Encerrar bimestre</button>
+                        </form>
+                        
                     </div>
                 </div>
             </div>
