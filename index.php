@@ -123,6 +123,7 @@ if(isset($_POST['usuario_s']) AND isset($_POST['senha_s'])){
             </div>
         </div>
     </main>
+
     <footer class="w-full flex items-center py-2 justify-around mt-24 border-t-2 border-[#357950]">
         <div>
             <img src="./src/logo-caixa.png" class="w-40" alt="Logo da Caixa">
@@ -134,6 +135,9 @@ if(isset($_POST['usuario_s']) AND isset($_POST['senha_s'])){
             <img src="./src/logo-estado.png" class="w-40" alt="Logo do Estado">
         </div>
     </footer>
+
+
+
     <section id="modalSecretaria" class="flex items-center justify-center fixed inset-0 backdrop-blur-sm bg-black/40 opacity-0 scale-95 pointer-events-none transition-all duration-300 z-50">
         <form action="" method="post" class="w-[22rem] bg-[#4bac72] rounded-lg relative shadow-xl">
             <h2 class="text-2xl font-bold text-center my-4 text-white">LOGIN</h2>
@@ -155,6 +159,7 @@ if(isset($_POST['usuario_s']) AND isset($_POST['senha_s'])){
             </div>
         </form>
     </section>
+
     <section id="modalCoordenador" class="flex items-center justify-center fixed inset-0 backdrop-blur-sm bg-black/40 opacity-0 scale-95 pointer-events-none transition-all duration-300 z-50">
         <form action="" method="post" class="w-[22rem] bg-[#4bac72] rounded-lg relative shadow-xl">
 
