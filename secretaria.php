@@ -3,6 +3,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 include "conn.php";
+include "protects.php";
 
 // KPIs usando media_total e frequencia_total
 $sql = "SELECT 
@@ -191,20 +192,31 @@ $frequenciaGauge = isset($kpis['frequencia']) ? (float)$kpis['frequencia'] : 0;
 
     <!-- Menu lateral -->
     <div id="sidebar" class="fixed top-0 right-0 h-full w-64 bg-gradient-to-b from-[#4bac72] via-[#4bac72] to-[#EDD542] shadow-lg transform translate-x-full transition-transform duration-300 flex flex-col p-4 z-50">
-        <button onclick="toggleMenu()" class="self-end mb-4 text-white text-xl font-bold cursor-pointer">✕</button>
-        <?php
-        $menu = [
-            ['Aluno', '<i class="fa-solid fa-graduation-cap"></i>'],
-            ['Escola', '<i class="fa-solid fa-school"></i>'],
-            ['Coordenador', '<i class="fa-solid fa-user"></i>']
-        ];
-        foreach ($menu as $item) {
-            echo '<button class="flex justify-between items-center w-full bg-white rounded-lg p-3 mb-2 hover:bg-gray-100 cursor-pointer">';
-            echo '<span>' . $item[0] . '</span>';
-            echo '<span>' . $item[1] . '</span>';
-            echo '</button>';
-        }
-        ?>
+    <button onclick="toggleMenu()" class="self-end mb-4 text-white text-xl font-bold cursor-pointer">✕</button>
+    <?php
+    $menu = [
+        ['Aluno', '<i class="fa-solid fa-graduation-cap"></i>', 'aluno.php'],
+        ['Escola', '<i class="fa-solid fa-school"></i>', 'escola.php'],
+        ['Coordenador', '<i class="fa-solid fa-user"></i>', 'acoescoordenador.php'],
+    ];
+    foreach ($menu as $item) {
+        echo '<a href="' . $item[2] . '" class="flex justify-between items-center w-full bg-white rounded-lg p-3 mb-2 hover:bg-gray-100 cursor-pointer">';
+        echo '<span>' . $item[0] . '</span>';
+        echo '<span>' . $item[1] . '</span>';
+        echo '</a>';
+    }
+    ?>
+    
+    <!-- Botão de Logout -->
+    <a href="logout.php" class="flex justify-center items-center w-full bg-red-600 text-white font-semibold rounded-lg p-3 mt-auto hover:bg-red-700 cursor-pointer shadow-md">
+        <i class="fa-solid fa-right-from-bracket mr-2"></i> Sair
+    </a>
+</div>
+
+
+        
+    <!-- Botão de Logout -->
+
     </div>
 
     <main class="m-5">

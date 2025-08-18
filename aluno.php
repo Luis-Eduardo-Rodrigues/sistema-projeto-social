@@ -1,4 +1,36 @@
+<?php
+    include "protects.php";
+    require "conn.php"; 
+   
 
+    $query_count_alunos = "SELECT COUNT(*) FROM aluno";
+    $query_count_alunos_exec = $mysqli->query($query_count_alunos) or die($mysqli->error);
+    $sql_count_alunos = $query_count_alunos_exec->fetch_assoc();
+    $count_alunos = $sql_count_alunos['COUNT(*)'];
+
+    $pagina = 0;
+    
+    if(!isset($_GET['pagina'])){
+        $pagina = 1;
+    }else{
+        $pagina = $_GET['pagina'] ? intval($_GET['pagina']) : 1;
+    }
+    
+    $limit = 10;
+    $offset = ($pagina - 1) * $limit;
+
+    $numero_pagina = ceil($count_alunos / $limit);
+
+    $query_alunos = "SELECT * FROM aluno ORDER BY nome_aluno ASC LIMIT {$limit} OFFSET {$offset}";
+    $query_alunos_exec = $mysqli->query($query_alunos) or die($mysqli->error);
+
+    $query_escola = "SELECT * FROM escola";
+    $query_escola_exec = $mysqli->query($query_escola) or die($mysqli->error);
+    $escola = $query_escola_exec->fetch_assoc();
+
+
+
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -51,7 +83,7 @@
                                 <td class="p-4"><?= $aluno['ano'] ?></td>
                                 <td class="display-flex p-4">
                                     <button class="bg-[#edd542] hover:bg-yellow-600 text-black font-bold px-4 py-2 p-6 rounded cursor-pointer">Editar</button>
-                                    <button class="bg-[#cc3732] hover:bg-red-700 text-black font-bold px-4 py-2 p-6 rounded cursor-pointer">Excluir</button>
+                                    <button class="bg-[#cc3732] hover:bg-red-700 text-black font-bold px-4 py-2 p-6 rounded cursor-pointer" value="<?=$aluno['id_aluno'];?>">Excluir</button>
                                 </td>
                             </tr>
                             <?php
@@ -64,7 +96,7 @@
                             for($p=1;$p<=$numero_pagina;$p++){
                                 echo "<a href='?pagina={$p}'>[{$p}]</a>";
 
-                            } 
+                            }
                         ?>
                         <button class="w-10 h-10 rounded-full border border-green-800 bg-green-800 text-white font-bold">1</button>
                         <button class="w-10 h-10 rounded-full border border-green-800 text-green-800 font-bold">2</button>
