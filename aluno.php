@@ -1,15 +1,15 @@
 <?php
     include "protects.php";
     require "conn.php"; 
-   
-
-    if(isset($_SESSION['message'])){
-        if($_SESSION['message'] != ""){
-        echo "<script>alert('{$_SESSION['message']}')</script>";
-        unset($_SESSION['msg']);
-        $_SESSION['message'] = "";
-        }
+    
+   if(isset($_SESSION['msgupaluno'])){
+    if($_SESSION['msgupaluno'] != ""){
+        echo "<script>alert('{$_SESSION['msgupaluno']}')</script>";
+        $_SESSION['msgupaluno'] = "";
     }
+}
+
+    
 
     $query_count_alunos = "SELECT COUNT(*) FROM aluno";
     $query_count_alunos_exec = $mysqli->query($query_count_alunos) or die($mysqli->error);

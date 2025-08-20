@@ -5,6 +5,63 @@ ini_set('display_errors', 1);
 include "conn.php";
 include "protects.php";
 
+
+$sql_escolas = "SELECT nome_escola FROM escola";
+$sql_escolas_exec = $mysqli->query($sql_escolas) or die("Falha na consulta SQL". $mysqli->error);
+
+while($escola = $sql_escolas_exec->fetch_assoc()){
+    $nome_escola = $escola["nome_escola"];
+    
+    $query_coord = "SELECT bimestre FROM usuario WHERE nome_escola = '$nome_escola'";
+    $query_coord_exec = $mysqli->query( $query_coord ) or die("Falha na consulta SQL". $mysqli->error);
+    $bimestre = $query_coord_exec->fetch_assoc();
+
+    if($bimestre['bimestre'] == 1) {
+        $sql = "SELECT AVG(media_1) AS media_1 FROM aluno WHERE nome_escola = '$nome_escola' ";
+        $sql_exec = $mysqli->query($sql) or die("". $mysqli->error);
+        $media = $sql_exec->fetch_assoc();
+        $media1 = $media["media_1"];
+
+        $sql_up = "UPDATE escola SET media_total1 = '$media1' WHERE nome_escola = '$nome_escola'";
+        $sql_up_exec = $mysqli->query( $sql_up ) or die("". $mysqli->error);
+
+    }elseif($bimestre['bimestre'] == 2) {
+        $sql = "SELECT AVG(media_2) AS media_2 FROM aluno WHERE nome_escola = '$nome_escola' ";
+        $sql_exec = $mysqli->query( $sql ) or die("". $mysqli->error);
+        $media = $sql_exec->fetch_assoc();
+        $media2 = $media["media_2"];
+
+        $sql_up = "UPDATE escola SET media_total2 = '$media2' WHERE nome_escola = '$nome_escola'";
+        $sql_up_exec = $mysqli->query( $sql_up ) or die("". $mysqli->error);
+
+    }elseif($bimestre['bimestre'] == 3) {
+        $sql = "SELECT AVG(media_3) AS media_3 FROM aluno WHERE nome_escola = '$nome_escola' ";
+        $sql_exec = $mysqli->query( $sql ) or die("". $mysqli->error);
+        $media = $sql_exec->fetch_assoc();
+        $media3 = $media["media_3"];
+
+        $sql_up = "UPDATE escola SET media_total3 = '$media3'";
+        $sql_up_exec = $mysqli->query( $sql_up ) or die("". $mysqli->error);
+
+    }elseif($bimestre['bimestre'] == 4) {
+        $sql = "SELECT AVG(media_4) AS media_4 FROM aluno WHERE nome_escola = '$nome_escola' ";
+        $sql_exec = $mysqli->query( $sql ) or die("". $mysqli->error);
+        $media = $sql_exec->fetch_assoc();
+        $media4 = $media["media_4"];
+
+        $sql_up = "UPDATE escola SET media_total4 = '$media4' WHERE nome_escola = '$nome_escola'";
+        $sql_up_exec = $mysqli->query( $sql_up ) or die("". $mysqli->error);
+    }
+}
+
+
+
+
+
+
+
+
+
 // KPIs usando media_total e frequencia_total
 $sql = "SELECT 
             COUNT(*) AS bolsistas,

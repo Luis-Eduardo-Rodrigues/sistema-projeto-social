@@ -27,26 +27,54 @@ if($count){
 }
 }
 
-if(isset($_POST['editar'])){
-    $id = $_GET['id_aluno'];
-    $nomealuno = $_POST['nome_aluno'];
-    $cpfaluno = $_POST['cpf_aluno'];
-    $enderecoaluno = $_POST['numero_tecnico'];
-    $nomeescola = $_POST['nome_escola'];
-    $med1 = $_POST['media_1'];
-    $med2 = $_POST['media_2'];
-    $med3 = $_POST['media_3'];
-    $med4 = $_POST['media_4'];
-    $f1 = $_POST['frequencia_1'];
-    $f2 = $_POST['frequencia_2'];
-    $f3 = $_POST['frequencia_3'];
-    $f4 = $_POST['frequencia_4'];
-    $a = $_POST['ano'];
-    $queryUpdate = "UPDATE aluno SET nome_aluno = '$nomealuno', cpf_aluno = '$cpfaluno', endereco_aluno = '$enderecoaluno', nome_escola = '$nomeescola', media_1 = '$med1', media_2 = '$med2', media_3 = '$med3', media_4 = '$med4', frequencia_1 = '$f1', frequencia_2 = '$f2', frequencia_3 = '$f3', frequencia_4 = '$f4', ano = '$a' WHERE id_aluno = '$id'   " ;
+if(isset($_POST['update_aluno'])){
+
+    $idaluno = mysqli_real_escape_string($mysqli,$_POST['aluno_id']);
+    $nomealuno = mysqli_real_escape_string($mysqli,trim($_POST['nome_aluno']));
+    $cpfaluno = mysqli_real_escape_string($mysqli,trim($_POST['cpf_aluno']));
+    $codigoaluno = mysqli_real_escape_string($mysqli,trim($_POST['codigo_aluno']));
+    $nomeescola = mysqli_real_escape_string($mysqli,$_POST['escola']);
+    $med1 = mysqli_real_escape_string($mysqli,trim($_POST['media_1']));
+    $med2 = mysqli_real_escape_string($mysqli,trim($_POST['media_2']));
+    $med3 = mysqli_real_escape_string($mysqli,trim($_POST['media_3']));
+    $med4 = mysqli_real_escape_string($mysqli,trim($_POST['media_4']));
+    $f1 = mysqli_real_escape_string($mysqli,trim($_POST['frequencia_1']));
+    $f2 = mysqli_real_escape_string($mysqli,trim($_POST['frequencia_2']));
+    $f3 = mysqli_real_escape_string($mysqli,trim($_POST['frequencia_3']));
+    $f4 = mysqli_real_escape_string($mysqli,trim($_POST['frequencia_4']));
+    $a = mysqli_real_escape_string($mysqli,trim($_POST['ano_aluno']));
+
+    $queryescola = "SELECT nome_escola FROM aluno WHERE id_aluno = '$idaluno'";
+    $queryescolaexec = $mysqli->query($queryescola);
+    $escola = $queryescolaexec->fetch_assoc();
+    $escolaantes = $escola["nome_escola"];
+
+    if($escolaantes != $nomeescola) {
+        $sql_update =  "UPDATE escola 
+            SET qtd_alunos = qtd_alunos + 1 
+            WHERE nome_escola = '$nomeescola'";
+
+            $mysqli->query($sql_update) or die("Falha na execução do código SQL: " . $mysqli->error);
+
+        $sql_update =  "UPDATE escola 
+            SET qtd_alunos = qtd_alunos - 1 
+            WHERE nome_escola = '$escolaantes'";
+
+            $mysqli->query($sql_update) or die("Falha na execução do código SQL: " . $mysqli->error);
+    }
+
+    $queryUpdate = "UPDATE aluno SET nome_aluno = '$nomealuno', cpf_aluno = '$cpfaluno', codigo_aluno = '$codigoaluno', nome_escola = '$nomeescola', media_1 = '$med1', media_2 = '$med2', media_3 = '$med3', media_4 = '$med4', frequencia_1 = '$f1', frequencia_2 = '$f2', frequencia_3 = '$f3', frequencia_4 = '$f4', ano = '$a' WHERE id_aluno = '$idaluno'   " ;
 
     $consultaaluno = mysqli_query($mysqli, $queryUpdate);
-    // Quando o painel estiver pronto eu coloco no Location.
-    header('Location: ');
+
+    if(mysqli_affected_rows($mysqli) > 0){
+        $_SESSION["msgupaluno"] = "Aluno Atualizado";
+        header('Location: aluno.php');
+    }else{
+        $_SESSION["msgupaluno"] = "Aluno não atualizado";
+        header('Location: aluno.php');
+    }
+    
 }
 
 if(isset($_POST['delete_aluno'])){
