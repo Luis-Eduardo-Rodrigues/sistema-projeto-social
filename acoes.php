@@ -1,5 +1,6 @@
 <?php
 // Update pro pain Secretaria
+session_start();
 include "conn.php";
 
 if(isset($_GET['id_aluno'])){
@@ -48,14 +49,43 @@ if(isset($_POST['editar'])){
     header('Location: ');
 }
 
-if(isset($_POST['deletar_aluno'])){
-    $id = $_GET['id_aluno'];
-    if(isset($_GET['id_aluno'])){
+if(isset($_POST['delete_aluno'])){
+    $id = mysqli_real_escape_string($mysqli, $_POST['delete_aluno']);
+    $sql = "SELECT * FROM aluno WHERE id_aluno = '$id'";
+            $query = $mysqli->query($sql) or die("Falha na execução do código SQL: " . $mysqli->error);
+   
     $sqlDelete = mysqli_query($mysqli, "DELETE FROM aluno WHERE id_aluno = {$id}")
     or die (mysqli_error($connection));
-    // Quando o painel estiver pronto eu coloco no Location.
-    header('Location: ');
-    }
+
+    if(mysqli_affected_rows($mysqli) > 0){
+
+            $dados = $query->fetch_assoc(); 
+            $escola = $dados['nome_escola'];
+
+            $sql_escola = "SELECT * FROM escola WHERE nome_escola = '$escola'";
+            $query_escola = $mysqli->query($sql_escola) or die( "". $mysqli->error);
+
+            $dados_escola = $query_escola->fetch_assoc();
+            
+            $qtdalunos = $dados_escola['qtd_alunos'];
+            $qtd = $qtdalunos - 1;
+
+            $sql_update =  "UPDATE escola 
+            SET qtd_alunos = '$qtd' 
+            WHERE nome_escola = '$escola'";
+
+            $mysqli->query($sql_update) or die("Falha na execução do código SQL: " . $mysqli->error);
+
+            $_SESSION['message'] = "Aluno deletado";
+                    
+            header('Location: aluno.php');
+            exit;
+        }else{
+            $_SESSION['message'] = "Aluno não deletado";
+            header('Location: aluno.php');
+            exit;
+        }
+    
 
 }
 

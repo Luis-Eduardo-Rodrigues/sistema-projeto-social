@@ -82,7 +82,6 @@ $frequenciaGauge = isset($kpis['frequencia']) ? (float)$kpis['frequencia'] : 0;
         google.charts.setOnLoadCallback(drawCharts);
 
         function drawCharts() {
-            // Média Escolar por trimestre
             const dataMedia = google.visualization.arrayToDataTable(<?= json_encode($evolucaoMedia) ?>);
             const optMedia = {
                 legend: {
@@ -212,10 +211,6 @@ $frequenciaGauge = isset($kpis['frequencia']) ? (float)$kpis['frequencia'] : 0;
         <i class="fa-solid fa-right-from-bracket mr-2"></i> Sair
     </a>
 </div>
-
-
-        
-    <!-- Botão de Logout -->
 
     </div>
 
