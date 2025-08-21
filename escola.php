@@ -1,4 +1,30 @@
+<?php
+include("conn.php");
+include("protects.php");
 
+    $query_count_escola = "SELECT COUNT(*) FROM escola";
+    $query_count_escola_exec = $mysqli->query($query_count_escola) or die($mysqli->error);
+    $sql_count_escola = $query_count_escola_exec->fetch_assoc();
+    $count_escola = $sql_count_escola['COUNT(*)'];
+
+    $pagina = 0;
+    
+    if(!isset($_GET['pagina'])){
+        $pagina = 1;
+    }else{
+        $pagina = $_GET['pagina'] ? intval($_GET['pagina']) : 1;
+    }
+    
+    $limit = 10;
+    $offset = ($pagina - 1) * $limit;
+
+    $numero_pagina = ceil($count_escola / $limit);
+
+
+    $query_escola = "SELECT * FROM escola";
+    $query_escola_exec = $mysqli->query($query_escola) or die($mysqli->error);
+    
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -43,16 +69,16 @@
 
                         <tbody>
                             <?php
-                                while ($aluno = $query_alunos_exec->fetch_assoc()) {
+                                while ($escola = $query_escola_exec->fetch_assoc()) {
                                     
                                 
                             ?>
                             <tr class="border-b hover:bg-green-50">
-                                <td class="p-4 cursor-pointer"><?= $aluno['nome_escola'] ?></td>
-                                <td class="p-4"><?= $aluno['endereco_escola'] ?></td>
-                                <td class="p-4"><?= $aluno['qtd_alunos'] ?></td>
-                                <td class="p-4"><?= $aluno['media_total'] ?></td>
-                                <td class="p-4"><?= $aluno['frequencia_total'] ?></td>
+                                <td class="p-4 cursor-pointer"><?= $escola['nome_escola'] ?></td>
+                                <td class="p-4"><?= $escola['endereco_escola'] ?></td>
+                                <td class="p-4"><?= $escola['qtd_alunos'] ?></td>
+                                <td class="p-4"><?= $escola['media_total'] ?></td>
+                                <td class="p-4"><?= $escola['frequencia_total'] ?></td>
                                 <td class="display-flex p-4">
                                     <button class="bg-[#edd542] hover:bg-yellow-600 text-black font-bold px-4 py-2 p-6 rounded cursor-pointer">Editar</button>
                                     <button class="bg-[#cc3732] hover:bg-red-700 text-black font-bold px-4 py-2 p-6 rounded cursor-pointer">Excluir</button>

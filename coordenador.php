@@ -3,13 +3,14 @@
     require "conn.php"; 
 
     $escola_c = $_SESSION['escola'];
+    $ano = date('Y');
     
     if(isset($_SESSION['msg'])){
     echo "<script>alert('{$_SESSION['msg']}')</script>";
     unset($_SESSION['msg']);
     }
    
-    $query_count_alunos = "SELECT COUNT(*) FROM aluno WHERE nome_escola = '$escola_c'";
+    $query_count_alunos = "SELECT COUNT(*) FROM aluno WHERE nome_escola = '$escola_c' AND ano = '$ano'";
     $query_count_alunos_exec = $mysqli->query($query_count_alunos) or die($mysqli->error);
     $sql_count_alunos = $query_count_alunos_exec->fetch_assoc();
     $count_alunos = $sql_count_alunos['COUNT(*)'];
@@ -35,47 +36,109 @@
     $escola = $query_escola_exec->fetch_assoc();
 
     if (isset($_POST['alterar_bimestre'])) {
-        $bimestrenovo = $_SESSION['bimestre'] + 1;
-        echo "<script> alert('$bimestrenovo') </script>";
-        $id_usuario = $_SESSION['id_usuario'];
-        $sql = "UPDATE usuario SET bimestre = $bimestrenovo WHERE id_usuario = $id_usuario";
-        $sql_query = $mysqli->query($sql) or die("Falha na execução do código SQL: " . $mysqli->error);
-        $_SESSION['bimestre'] = $bimestrenovo;
+        if($_SESSION['bimestre'] == 4) {
+            $_SESSION['bimestre'] = 1 ;
+            $bimestrenovo = $_SESSION['bimestre'];
+            echo "<script> alert('$bimestrenovo') </script>";
+            $id_usuario = $_SESSION['id_usuario'];
+            $sql = "UPDATE usuario SET bimestre = $bimestrenovo WHERE id_usuario = $id_usuario";
+            $sql_query = $mysqli->query($sql) or die("Falha na execução do código SQL: " . $mysqli->error);
+            $_SESSION['bimestre'] = $bimestrenovo;
+        }else{
+            $bimestrenovo = $_SESSION['bimestre'] + 1;
+            echo "<script> alert('$bimestrenovo') </script>";
+            $id_usuario = $_SESSION['id_usuario'];
+            $sql = "UPDATE usuario SET bimestre = $bimestrenovo WHERE id_usuario = $id_usuario";
+            $sql_query = $mysqli->query($sql) or die("Falha na execução do código SQL: " . $mysqli->error);
+            $_SESSION['bimestre'] = $bimestrenovo;
+
+        }
+
+        
     }
 
     if(isset($_POST["add_media_frequencia"])){
         $aluno = $query_alunos_exec->fetch_assoc();
         $id_aluno = $_POST["add_media_frequencia"];
+
         $media = $_POST[$id_aluno];
         $frequencia = $_POST[$id_aluno . "2"];
 
         if ($_SESSION['bimestre'] == 1) {
-            $sql = "UPDATE aluno SET media_1 = $media, frequencia_1 = $frequencia WHERE id_aluno = $id_aluno";
-            mysqli_query($mysqli, $sql);
+            $sqlaluno = "SELECT * FROM aluno WHERE id_aluno = '$id_aluno'";
+            $query = $mysqli->query($sqlaluno) or die("". $mysqli->error);
+            $aluno = $query->fetch_assoc();
+
+            if($aluno['media_1'] == 0 AND $aluno['frequencia_1'] == 0){
+                $sql = "UPDATE aluno SET media_1 = $media, frequencia_1 = $frequencia WHERE id_aluno = $id_aluno";
+                mysqli_query($mysqli, $sql);
+                $_SESSION['msg'] = "Aluno atualizado!";
+                header("Location: coordenador.php");
+                    exit;
+            }else{
+                $_SESSION['msg'] = "Aluno não atualizado!";
+                header("Location: coordenador.php");
+                    exit;
+            }
+
+            
                            
         }elseif ($_SESSION["bimestre"] == 2) {
-            $sql = "UPDATE aluno SET media_2 = $media, frequencia_2 = $frequencia WHERE id_aluno = $id_aluno";
-            mysqli_query($mysqli, $sql);
+            $sqlaluno = "SELECT * FROM aluno WHERE id_aluno = '$id_aluno'";
+            $query = $mysqli->query($sqlaluno) or die("". $mysqli->error);
+            $aluno = $query->fetch_assoc();
+
+            if($aluno['media_2'] == 0 AND $aluno['frequencia_2'] == 0){
+                $sql = "UPDATE aluno SET media_2 = $media, frequencia_2 = $frequencia WHERE id_aluno = $id_aluno";
+                mysqli_query($mysqli, $sql);
+                $_SESSION['msg'] = "Aluno atualizado!";
+                header("Location: coordenador.php");
+                    exit;
+            }else{
+                $_SESSION['msg'] = "Aluno não atualizado!";
+                header("Location: coordenador.php");
+                    exit;
+            }
+
+            
                
         }elseif ($_SESSION["bimestre"] == 3) {
-            $sql = "UPDATE aluno SET media_3 = $media, frequencia_3 = $frequencia WHERE id_aluno = $id_aluno";
-            mysqli_query($mysqli, $sql);
-                             
+            $sqlaluno = "SELECT * FROM aluno WHERE id_aluno = '$id_aluno'";
+            $query = $mysqli->query($sqlaluno) or die("". $mysqli->error);
+            $aluno = $query->fetch_assoc();
+
+            if($aluno['media_3'] == 0 AND $aluno['frequencia_3'] == 0){
+                $sql = "UPDATE aluno SET media_3 = $media, frequencia_3 = $frequencia WHERE id_aluno = $id_aluno";
+                mysqli_query($mysqli, $sql);
+                $_SESSION['msg'] = "Aluno atualizado!";
+                header("Location: coordenador.php");
+                exit;
+            }else{
+                $_SESSION['msg'] = "Aluno não atualizado!";
+                header("Location: coordenador.php");
+                    exit;
+            }
+          
         }elseif ($_SESSION["bimestre"] == 4) {
-            $sql = "UPDATE aluno SET media_4 = $media, frequencia_4 = $frequencia WHERE id_aluno = $id_aluno";
-            mysqli_query($mysqli, $sql);
+            $sqlaluno = "SELECT * FROM aluno WHERE id_aluno = '$id_aluno'";
+            $query = $mysqli->query($sqlaluno) or die("". $mysqli->error);
+            $aluno = $query->fetch_assoc();
+
+            if($aluno['media_4'] == 0 AND $aluno['frequencia_4'] == 0){
+                $sql = "UPDATE aluno SET media_4 = $media, frequencia_4 = $frequencia WHERE id_aluno = $id_aluno";
+                mysqli_query($mysqli, $sql);
+                $_SESSION['msg'] = "Aluno atualizado!";
+                header("Location: coordenador.php");
+                exit;
+            }else{
+                $_SESSION['msg'] = "Aluno não atualizado!";
+                header("Location: coordenador.php");
+                exit;
+            }
+            
             
         }
 
-        if(mysqli_affected_rows($mysqli) > 0){
-                    $_SESSION['msg'] = "Aluno atualizado!";
-                    header("Location: coordenador.php");
-                    exit;
-            }else{
-                    $_SESSION['msg'] = "Aluno não atualizado!";
-                    header("Location: coordenador.php");
-                    exit;
-        } 
 
     }
 ?>
@@ -121,6 +184,7 @@
                                 <th class="p-4 text-left">NOME</th>
                                 <th class="p-4 text-left">CPF</th>
                                 <th class="p-4 text-left">MÉDIA</th>
+                                <th class="p-4 text-left">FREQUENCIA</th>
                                 <th class="p-4 text-left">AÇÕES</th>
                             </tr>
                         </thead>
@@ -163,11 +227,12 @@
                     <div class="flex justify-center gap-2 my-4 relative">
                         <?php
                             for($p=1;$p<=$numero_pagina;$p++){
-                                echo "<a href='?pagina={$p}'>[{$p}]</a>";
+                                echo "<a class='px-4 py-2 rounded-full border border-green-800 text-white text-center font-bold bg-green-800' href='?pagina={$p}'>{$p}</a>";
                             }
                         ?>
-                        <form action="" method="post">
-                            <button type="submit" class="px-4 py-2 rounded text-white font-bold bg-green-700 absolute right-4" name="alterar_bimestre">Encerrar bimestre</button>
+                        <form action="" method="post" class="">
+                            <a href="logout.php" class="px-4 py-2 bg-red-800 text-white font-bold absolute right-0 mr-6 rounded-md">Sair</a>
+                            <button type="submit" class="px-4 py-2 rounded text-white font-bold bg-green-700 absolute right-24 cursor-pointer" name="alterar_bimestre">Encerrar bimestre</button>
                         </form>
                     </div>
                 </div>
