@@ -1,6 +1,6 @@
 <?php
     include "protects.php";
-    require "conn.php"; 
+    require "conn.php";
    
 
     $query_count_alunos = "SELECT COUNT(*) FROM aluno";
@@ -26,7 +26,7 @@
 
     $query_escola = "SELECT * FROM escola";
     $query_escola_exec = $mysqli->query($query_escola) or die($mysqli->error);
-    $escola = $query_escola_exec->fetch_assoc();
+    $escola = $query_escola_exec->fetch_assoc(); 
 
 
 

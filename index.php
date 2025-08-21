@@ -1,5 +1,5 @@
 <?php
-include "conn.php";
+ include "conn.php";
 
  if (isset($_POST['usuario_c']) || isset($_POST['senha_c'])) {
         
@@ -80,7 +80,7 @@ if(isset($_POST['usuario_s']) AND isset($_POST['senha_s'])){
         }
 
         
-    }
+    } 
 }
 ?> 
 <!DOCTYPE html>

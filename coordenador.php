@@ -1,5 +1,5 @@
 <?php
-    include "protectc.php";
+   include "protectc.php";
     require "conn.php"; 
 
     $escola_c = $_SESSION['escola'];
