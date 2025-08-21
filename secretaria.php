@@ -54,14 +54,6 @@ while($escola = $sql_escolas_exec->fetch_assoc()){
     }
 }
 
-
-
-
-
-
-
-
-
 // KPIs usando media_total e frequencia_total
 $sql = "SELECT 
             COUNT(*) AS bolsistas,
@@ -270,11 +262,6 @@ $frequenciaGauge = isset($kpis['frequencia']) ? (float)$kpis['frequencia'] : 0;
         <i class="fa-solid fa-right-from-bracket mr-2"></i> Sair
     </a>
 </div>
-<<<<<<< HEAD
-    <!-- Botão de Logout -->
-=======
->>>>>>> 8f9c2ab500baed1aa87a705a68439ec803b82979
-
     </div>
 
     <main class="m-5">
