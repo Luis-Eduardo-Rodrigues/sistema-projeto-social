@@ -17,7 +17,7 @@ while($escola = $sql_escolas_exec->fetch_assoc()){
     $bimestre = $query_coord_exec->fetch_assoc();
 
     if($bimestre['bimestre'] == 1) {
-        $sql = "SELECT AVG(media_1) AS media_1 FROM aluno WHERE nome_escola = '$nome_escola' ";
+        $sql = "SELECT AVG(media_1_municipal) AS media_1 FROM aluno WHERE nome_escola = '$nome_escola' ";
         $sql_exec = $mysqli->query($sql) or die("". $mysqli->error);
         $media = $sql_exec->fetch_assoc();
         $media1 = $media["media_1"];
@@ -65,7 +65,7 @@ while($escola = $sql_escolas_exec->fetch_assoc()){
 // KPIs usando media_total e frequencia_total
 $sql = "SELECT 
             COUNT(*) AS bolsistas,
-            AVG(media_total) AS media_escolar,
+            AVG(media_total1) AS media_escolar,
             AVG(frequencia_total) AS frequencia
         FROM escola";
 $res = $mysqli->query($sql);
@@ -75,10 +75,10 @@ $kpis = $res->fetch_assoc();
 // Evolução das médias por trimestre
 $evolucaoMedia = [['Trimestre', 'Média']];
 $sql = "SELECT 
-            AVG(media_1) AS m1,
-            AVG(media_2) AS m2,
-            AVG(media_3) AS m3,
-            AVG(media_4) AS m4
+            AVG(media_1_municipal) AS m1,
+            AVG(media_2_municipal) AS m2,
+            AVG(media_3_municipal) AS m3,
+            AVG(media_4_municipal) AS m4
         FROM aluno";
 $res = $mysqli->query($sql);
 if (!$res) die("Erro Evolução Média: " . $mysqli->error);
@@ -92,10 +92,10 @@ if ($row = $res->fetch_assoc()) {
 // Evolução da frequência por trimestre
 $evolucaoFrequencia = [['Trimestre', 'Frequência']];
 $sql = "SELECT 
-            AVG(frequencia_1) AS f1,
-            AVG(frequencia_2) AS f2,
-            AVG(frequencia_3) AS f3,
-            AVG(frequencia_4) AS f4
+            AVG(frequencia_1_municipal) AS f1,
+            AVG(frequencia_2_municipal) AS f2,
+            AVG(frequencia_3_municipal) AS f3,
+            AVG(frequencia_4_municipal) AS f4
         FROM aluno";
 $res = $mysqli->query($sql);
 if (!$res) die("Erro Evolução Frequência: " . $mysqli->error);

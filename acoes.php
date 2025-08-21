@@ -77,10 +77,33 @@ if(isset($_POST['update_aluno'])){
     
 }
 
+if(isset($_POST['pagamento_aluno'])){
+
+    $id = mysqli_real_escape_string($mysqli, $_POST['pagamento_aluno']);
+    $sql = "SELECT pagamento FROM aluno WHERE id_aluno = '$id'";
+    $query = $mysqli->query($sql) or die("Falha na execução do código SQL: " . $mysqli->error);
+    $dados = $query->fetch_assoc();
+
+    $pagamentoantes = $dados["pagamento"];
+    $pagamento = $pagamentoantes + 1;
+
+    $queryUpdate = "UPDATE aluno SET pagamento = '$pagamento' WHERE id_aluno = '$id'   " ;
+    $consultaaluno = mysqli_query($mysqli, $queryUpdate);
+
+    if(mysqli_affected_rows($mysqli) > 0){
+        $_SESSION["msgupaluno"] = "Aluno Atualizado";
+        header('Location: aluno.php');
+    }else{
+        $_SESSION["msgupaluno"] = "Aluno não atualizado";
+        header('Location: aluno.php');
+    }
+    
+}
+
 if(isset($_POST['delete_aluno'])){
     $id = mysqli_real_escape_string($mysqli, $_POST['delete_aluno']);
     $sql = "SELECT * FROM aluno WHERE id_aluno = '$id'";
-            $query = $mysqli->query($sql) or die("Falha na execução do código SQL: " . $mysqli->error);
+    $query = $mysqli->query($sql) or die("Falha na execução do código SQL: " . $mysqli->error);
    
     $sqlDelete = mysqli_query($mysqli, "DELETE FROM aluno WHERE id_aluno = {$id}")
     or die (mysqli_error($connection));

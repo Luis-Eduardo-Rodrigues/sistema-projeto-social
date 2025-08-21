@@ -69,8 +69,8 @@
             $query = $mysqli->query($sqlaluno) or die("". $mysqli->error);
             $aluno = $query->fetch_assoc();
 
-            if($aluno['media_1'] == 0 AND $aluno['frequencia_1'] == 0){
-                $sql = "UPDATE aluno SET media_1 = $media, frequencia_1 = $frequencia WHERE id_aluno = $id_aluno";
+            if($aluno['media_1_municipal'] == 0 AND $aluno['frequencia_1_municipal'] == 0){
+                $sql = "UPDATE aluno SET media_1_municipal = $media, frequencia_1_municipal = $frequencia WHERE id_aluno = $id_aluno";
                 mysqli_query($mysqli, $sql);
                 $_SESSION['msg'] = "Aluno atualizado!";
                 header("Location: coordenador.php");
@@ -88,8 +88,8 @@
             $query = $mysqli->query($sqlaluno) or die("". $mysqli->error);
             $aluno = $query->fetch_assoc();
 
-            if($aluno['media_2'] == 0 AND $aluno['frequencia_2'] == 0){
-                $sql = "UPDATE aluno SET media_2 = $media, frequencia_2 = $frequencia WHERE id_aluno = $id_aluno";
+            if($aluno['media_2_municipal'] == 0 AND $aluno['frequencia_2_municipal'] == 0){
+                $sql = "UPDATE aluno SET media_2_municipal = $media, frequencia_2_municipal = $frequencia WHERE id_aluno = $id_aluno";
                 mysqli_query($mysqli, $sql);
                 $_SESSION['msg'] = "Aluno atualizado!";
                 header("Location: coordenador.php");
@@ -107,8 +107,8 @@
             $query = $mysqli->query($sqlaluno) or die("". $mysqli->error);
             $aluno = $query->fetch_assoc();
 
-            if($aluno['media_3'] == 0 AND $aluno['frequencia_3'] == 0){
-                $sql = "UPDATE aluno SET media_3 = $media, frequencia_3 = $frequencia WHERE id_aluno = $id_aluno";
+            if($aluno['media_3_municipal'] == 0 AND $aluno['frequencia_3_municipal'] == 0){
+                $sql = "UPDATE aluno SET media_3_municipal = $media, frequencia_3_municipal = $frequencia WHERE id_aluno = $id_aluno";
                 mysqli_query($mysqli, $sql);
                 $_SESSION['msg'] = "Aluno atualizado!";
                 header("Location: coordenador.php");
@@ -124,8 +124,8 @@
             $query = $mysqli->query($sqlaluno) or die("". $mysqli->error);
             $aluno = $query->fetch_assoc();
 
-            if($aluno['media_4'] == 0 AND $aluno['frequencia_4'] == 0){
-                $sql = "UPDATE aluno SET media_4 = $media, frequencia_4 = $frequencia WHERE id_aluno = $id_aluno";
+            if($aluno['media_4_municipal'] == 0 AND $aluno['frequencia_4_municipal'] == 0){
+                $sql = "UPDATE aluno SET media_4_municipal = $media, frequencia_4_municipal = $frequencia WHERE id_aluno = $id_aluno";
                 mysqli_query($mysqli, $sql);
                 $_SESSION['msg'] = "Aluno atualizado!";
                 header("Location: coordenador.php");
@@ -189,40 +189,54 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php
-                                $b = $_SESSION['bimestre']; 
-                                $campo_media = "media_" . $b;
-                                $campo_freq  = "frequencia_" . $b;
+    <?php
+        $b = $_SESSION['bimestre']; 
 
-                                while ($aluno = $query_alunos_exec->fetch_assoc()) {
-                            ?>
-                            <tr class="border-b hover:bg-green-50">
-                                <td class="p-4 cursor-pointer"><?= $aluno['nome_aluno'] ?></td>
-                                <td class="p-4"><?= $aluno['cpf_aluno'] ?></td>
-                                <form action="" method="post">
-                                    <td class="p-4">
-                                        <input type="text" 
-                                               name="<?=$aluno['id_aluno']?>" 
-                                               class="border border-green-500 rounded-full px-3 py-2 w-24 text-center focus:outline-none" 
-                                               value="<?= $aluno[$campo_media] ?>" 
-                                               placeholder="Média" />
-                                    </td>
-                                    <td class="p-4">
-                                        <input type="text" 
-                                               name="<?=$aluno['id_aluno'] . "2"?>" 
-                                               class="border border-green-500 rounded-full px-3 py-2 w-24 text-center focus:outline-none" 
-                                               value="<?= $aluno[$campo_freq] ?>" 
-                                               placeholder="0%" />
-                                    </td>
-                                    <td class="p-4">
-                                        <button class="bg-green-700 text-white font-bold px-4 py-2 rounded cursor-pointer" name="add_media_frequencia" value="<?=$aluno['id_aluno'];?>" >Salvar</button>
-                                    </td>
-                                </form>
-                            </tr>
-                            <?php
-                                }
-                            ?>
-                        </tbody>
+        while ($aluno = $query_alunos_exec->fetch_assoc()) {
+            // Verificação acumulada até o bimestre atual
+            $atingiu = true;
+            for ($i=1; $i<=$b; $i++) {
+                $mediaCheck = $aluno["media_{$i}_municipal"];
+                $freqCheck  = $aluno["frequencia_{$i}_municipal"];
+
+                if ($mediaCheck < 6 || $freqCheck < 75) {
+                    $atingiu = false;
+                    break;
+                }
+            }
+
+            // Classe de fundo condicional
+            $linhaClasse = $atingiu ? "border-b hover:bg-green-50" : "border-b bg-red-200 hover:bg-red-300";
+    ?>
+    <tr class="<?= $linhaClasse ?>">
+        <td class="p-4 cursor-pointer"><?= $aluno['nome_aluno'] ?></td>
+        <td class="p-4"><?= $aluno['cpf_aluno'] ?></td>
+        <form action="" method="post">
+            <td class="p-4">
+                <input type="text" 
+                       name="<?=$aluno['id_aluno']?>" 
+                       class="border border-green-500 rounded-full px-3 py-2 w-24 text-center focus:outline-none" 
+                       value="<?= $aluno["media_{$b}_municipal"] ?>" 
+                       placeholder="Média" />
+            </td>
+            <td class="p-4">
+                <input type="text" 
+                       name="<?=$aluno['id_aluno'] . "2"?>" 
+                       class="border border-green-500 rounded-full px-3 py-2 w-24 text-center focus:outline-none" 
+                       value="<?= $aluno["frequencia_{$b}_municipal"] ?>" 
+                       placeholder="0%" />
+            </td>
+            <td class="p-4">
+                <button class="bg-green-700 text-white font-bold px-4 py-2 rounded cursor-pointer" 
+                        name="add_media_frequencia" 
+                        value="<?=$aluno['id_aluno'];?>">Salvar</button>
+            </td>
+        </form>
+    </tr>
+    <?php
+        }
+    ?>
+</tbody>
                     </table>
                     <div class="flex justify-center gap-2 my-4 relative">
                         <?php

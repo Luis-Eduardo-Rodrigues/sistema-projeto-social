@@ -60,8 +60,6 @@ include("protects.php");
                                 <th class="p-4 text-left">NOME</th>
                                 <th class="p-4 text-left">ENDEREÇO</th>
                                 <th class="p-4 text-left">QUANTIDADE DE ALUNOS</th>
-                                <th class="p-4 text-left">MÉDIA TOTAL</th>
-                                <th class="p-4 text-left">FREQUÊNCIA TOTAL</th>
                                 <th class="p-4 text-left">AÇÕES</th>
                             </tr>
                         </thead>
@@ -77,8 +75,6 @@ include("protects.php");
                                 <td class="p-4 cursor-pointer"><?= $escola['nome_escola'] ?></td>
                                 <td class="p-4"><?= $escola['endereco_escola'] ?></td>
                                 <td class="p-4"><?= $escola['qtd_alunos'] ?></td>
-                                <td class="p-4"><?= $escola['media_total'] ?></td>
-                                <td class="p-4"><?= $escola['frequencia_total'] ?></td>
                                 <td class="display-flex p-4">
                                     <button class="bg-[#edd542] hover:bg-yellow-600 text-black font-bold px-4 py-2 p-6 rounded cursor-pointer">Editar</button>
                                     <button class="bg-[#cc3732] hover:bg-red-700 text-black font-bold px-4 py-2 p-6 rounded cursor-pointer">Excluir</button>
@@ -92,14 +88,10 @@ include("protects.php");
                     <div class="flex justify-center gap-2 my-4">
                         <?php
                             for($p=1;$p<=$numero_pagina;$p++){
-                                echo "<a href='?pagina={$p}'>[{$p}]</a>";
+                                echo "<a class='px-4 py-2 rounded-full border text-center border-green-800 bg-green-800 text-white font-bold' href='?pagina={$p}'>{$p}</a>";
 
                             } 
                         ?>
-                        <button class="w-10 h-10 rounded-full border border-green-800 bg-green-800 text-white font-bold">1</button>
-                        <button class="w-10 h-10 rounded-full border border-green-800 text-green-800 font-bold">2</button>
-                        <button class="w-10 h-10 rounded-full border border-green-800 text-green-800 font-bold">3</button>
-                        <button class="w-10 h-10 rounded-full border border-green-800 text-green-800 font-bold">4</button>
                     </div>
                 </div>
             </div>
