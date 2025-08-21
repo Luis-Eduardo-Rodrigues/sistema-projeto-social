@@ -1,7 +1,6 @@
 <?php
-include('conn.php');
-include('protects.php');
-
+    include('conn.php');
+    include('protects.php');
 ?>
 
 <!DOCTYPE html>
@@ -41,7 +40,6 @@ include('protects.php');
 
         <h2 class="text-3xl font-bold text-center">Editar Aluno</h2>
 
-        <!-- Grupo 1 -->
         <div class="grid grid-cols-2 gap-10">
             <div class="flex flex-col gap-2">
                 <label>Nome:</label>
@@ -74,7 +72,6 @@ include('protects.php');
             </div>
         </div>
 
-        <!-- Grupo 2 -->
         <h3 class="text-xl font-semibold text-center">Médias</h3>
         <div class="grid grid-cols-4 gap-6">
             <div class="flex flex-col gap-2">
@@ -95,7 +92,6 @@ include('protects.php');
             </div>
         </div>
 
-        <!-- Grupo 3 -->
         <h3 class="text-xl font-semibold text-center">Frequência</h3>
         <div class="grid grid-cols-4 gap-6">
             <div class="flex flex-col gap-2">
@@ -116,7 +112,6 @@ include('protects.php');
             </div>
         </div>
 
-        <!-- Botões -->
         <div class="flex items-center justify-center gap-6 mt-6">
             <button type="submit" name="update_aluno" class="px-6 py-3 rounded-md bg-green-700 hover:bg-green-800 text-white font-bold">Salvar</button>
             <a href="aluno.php" class="px-6 py-3 rounded-md bg-red-700 hover:bg-red-800 text-white font-bold">Voltar</a>
