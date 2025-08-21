@@ -5,11 +5,10 @@
 
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Aluno - Sistema de Controle</title>
+    <title>Adicionar Aluno - Sistema de Controle</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha512-DxV+EoADOkOygM4IR9yXP8Sb2qwgidEmeqAEmDKIOfPRQZOWbXCzLC6vjbZyy0vPisbH2SyW27+ddLVCN+OMzQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,38 +23,31 @@
 
 <body class="bg-gray-50">
 
-    <?php
-        $id_aluno = $_GET['id'];
-        $sql = "SELECT * FROM aluno WHERE id_aluno = '$id_aluno'";
-        $query = $mysqli->query($sql) or die();
-        $aluno = $query->fetch_assoc();
-    ?>
-
     <header class="mb-8">
         <img src="./src/header.png" class="w-full" />
     </header>
 
     <form action="acoes.php" method="POST" class="max-w-6xl mx-auto bg-white shadow-lg rounded-xl p-12 flex flex-col gap-10">
-        <input type="hidden" name="aluno_id" value="<?=$aluno['id_aluno'];?>">
+        <input type="hidden" name="aluno_id">
 
-        <h2 class="text-3xl font-bold text-center">Editar Aluno</h2>
+        <h2 class="text-3xl font-bold text-center">Adicionar Aluno</h2>
 
         <div class="grid grid-cols-2 gap-10">
             <div class="flex flex-col gap-2">
                 <label>Nome:</label>
-                <input class="w-full rounded-md px-4 py-2 border border-gray-400" value="<?= $aluno['nome_aluno'] ?>" name="nome_aluno" type="text">
+                <input class="w-full rounded-md px-4 py-2 border border-gray-400" name="nome_aluno" type="text">
             </div>
             <div class="flex flex-col gap-2">
                 <label>CPF:</label>
-                <input class="w-full rounded-md px-4 py-2 border border-gray-400" name="cpf_aluno" type="text" value="<?= $aluno['cpf_aluno'] ?>">
+                <input class="w-full rounded-md px-4 py-2 border border-gray-400" name="cpf_aluno" type="text">
             </div>
             <div class="flex flex-col gap-2">
                 <label>Ano:</label>
-                <input class="w-full rounded-md px-4 py-2 border border-gray-400" name="ano_aluno" type="text" value="<?= $aluno['ano'] ?>">
+                <input class="w-full rounded-md px-4 py-2 border border-gray-400" name="ano_aluno" type="text">
             </div>
             <div class="flex flex-col gap-2">
                 <label>Código do Aluno:</label>
-                <input class="w-full rounded-md px-4 py-2 border border-gray-400" name="codigo_aluno" type="text" value="<?= $aluno['codigo_aluno'] ?>">
+                <input class="w-full rounded-md px-4 py-2 border border-gray-400" name="codigo_aluno" type="text">
             </div>
             <div class="flex flex-col gap-2 col-span-2">
                 <label>Escola:</label>
@@ -113,7 +105,7 @@
         </div>
 
         <div class="flex items-center justify-center gap-6 mt-6">
-            <button type="submit" name="update_aluno" class="px-6 py-3 rounded-md bg-green-700 hover:bg-green-800 text-white font-bold">Salvar</button>
+            <button type="submit" name="add_aluno" class="px-6 py-3 rounded-md bg-green-700 hover:bg-green-800 text-white font-bold">Salvar</button>
             <a href="aluno.php" class="px-6 py-3 rounded-md bg-red-700 hover:bg-red-800 text-white font-bold">Voltar</a>
         </div>
     </form>

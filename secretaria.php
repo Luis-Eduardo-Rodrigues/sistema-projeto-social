@@ -54,14 +54,6 @@ while($escola = $sql_escolas_exec->fetch_assoc()){
     }
 }
 
-
-
-
-
-
-
-
-
 // KPIs usando media_total e frequencia_total
 $sql = "SELECT 
             COUNT(*) AS bolsistas,
@@ -250,17 +242,19 @@ $frequenciaGauge = isset($kpis['frequencia']) ? (float)$kpis['frequencia'] : 0;
     <div id="sidebar" class="fixed top-0 right-0 h-full w-64 bg-gradient-to-b from-[#4bac72] via-[#4bac72] to-[#EDD542] shadow-lg transform translate-x-full transition-transform duration-300 flex flex-col p-4 z-50">
     <button onclick="toggleMenu()" class="self-end mb-4 text-white text-xl font-bold cursor-pointer">✕</button>
     <?php
-    $menu = [
-        ['Aluno', '<i class="fa-solid fa-graduation-cap"></i>', 'aluno.php'],
-        ['Escola', '<i class="fa-solid fa-school"></i>', 'escola.php'],
-        ['Coordenador', '<i class="fa-solid fa-user"></i>', 'acoescoordenador.php'],
-    ];
-    foreach ($menu as $item) {
-        echo '<a href="' . $item[2] . '" class="flex justify-between items-center w-full bg-white rounded-lg p-3 mb-2 hover:bg-gray-100 cursor-pointer">';
-        echo '<span>' . $item[0] . '</span>';
-        echo '<span>' . $item[1] . '</span>';
-        echo '</a>';
-    }
+        $menu = [
+            ['Aluno', '<i class="fa-solid fa-graduation-cap"></i>', 'aluno.php'],
+            ['Escola', '<i class="fa-solid fa-school"></i>', 'escola.php'],
+            ['Coordenador', '<i class="fa-solid fa-user"></i>', 'acoescoordenador.php'],
+            ['Montar Relatório', '<i class="fa-solid fa-file-lines"></i>', 'relatorio.php']
+        ];
+        foreach ($menu as $item) {
+            echo '<a href="' . $item[2] . '" class="flex justify-between items-center w-full bg-white rounded-lg p-3 mb-2 hover:bg-gray-100 cursor-pointer">';
+            echo '<span>' . $item[0] . '</span>';
+            echo '<span>' . $item[1] . '</span>';
+            echo '<span>' . $item[3] . '</span>';
+            echo '</a>';
+        }
     ?>
     
     <!-- Botão de Logout -->
@@ -268,7 +262,6 @@ $frequenciaGauge = isset($kpis['frequencia']) ? (float)$kpis['frequencia'] : 0;
         <i class="fa-solid fa-right-from-bracket mr-2"></i> Sair
     </a>
 </div>
-
     </div>
 
     <main class="m-5">

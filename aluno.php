@@ -1,5 +1,6 @@
 <?php
     include "protects.php";
+    require "conn.php";
     require "conn.php"; 
     
    if(isset($_SESSION['msgupaluno'])){
@@ -8,8 +9,6 @@
         $_SESSION['msgupaluno'] = "";
     }
 }
-
-    
 
     $query_count_alunos = "SELECT COUNT(*) FROM aluno";
     $query_count_alunos_exec = $mysqli->query($query_count_alunos) or die($mysqli->error);
@@ -34,6 +33,7 @@
 
     $query_escola = "SELECT * FROM escola";
     $query_escola_exec = $mysqli->query($query_escola) or die($mysqli->error);
+    $escola = $query_escola_exec->fetch_assoc(); 
     $escola = $query_escola_exec->fetch_assoc();
 ?>
 <!DOCTYPE html>
@@ -110,8 +110,8 @@
             </div>
             
             <div class="bottom-0 right-16 w-full p-6 text-end">
-                <button class="bg-[#4bac72] hover:bg-green-700 text-black font-bold px-4 py-2 rounded cursor-pointer">Adicionar Aluno</button>
-                <button class="bg-[#edd542] hover:bg-yellow-700 text-black font-bold px-4 py-2 rounded cursor-pointer">Salvar</button>
+                <button class="position:fixed bg-[#4bac72] hover:bg-green-700 text-black font-bold px-4 py-2 rounded cursor-pointer">Adicionar Aluno</button>
+                <button class="position:fixed bg-[#edd542] hover:bg-yellow-700 text-black font-bold px-4 py-2 rounded cursor-pointer">Salvar</button>
             </div>
         </section>
     </main>
