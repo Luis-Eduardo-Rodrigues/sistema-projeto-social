@@ -26,7 +26,7 @@ while($escola = $sql_escolas_exec->fetch_assoc()){
         $sql_up_exec = $mysqli->query( $sql_up ) or die("". $mysqli->error);
 
     }elseif($bimestre['bimestre'] == 2) {
-        $sql = "SELECT AVG(media_2) AS media_2 FROM aluno WHERE nome_escola = '$nome_escola' ";
+        $sql = "SELECT AVG(media_2_municipal) AS media_2 FROM aluno WHERE nome_escola = '$nome_escola' ";
         $sql_exec = $mysqli->query( $sql ) or die("". $mysqli->error);
         $media = $sql_exec->fetch_assoc();
         $media2 = $media["media_2"];
@@ -35,7 +35,7 @@ while($escola = $sql_escolas_exec->fetch_assoc()){
         $sql_up_exec = $mysqli->query( $sql_up ) or die("". $mysqli->error);
 
     }elseif($bimestre['bimestre'] == 3) {
-        $sql = "SELECT AVG(media_3) AS media_3 FROM aluno WHERE nome_escola = '$nome_escola' ";
+        $sql = "SELECT AVG(media_3_municipal) AS media_3 FROM aluno WHERE nome_escola = '$nome_escola' ";
         $sql_exec = $mysqli->query( $sql ) or die("". $mysqli->error);
         $media = $sql_exec->fetch_assoc();
         $media3 = $media["media_3"];
@@ -44,7 +44,7 @@ while($escola = $sql_escolas_exec->fetch_assoc()){
         $sql_up_exec = $mysqli->query( $sql_up ) or die("". $mysqli->error);
 
     }elseif($bimestre['bimestre'] == 4) {
-        $sql = "SELECT AVG(media_4) AS media_4 FROM aluno WHERE nome_escola = '$nome_escola' ";
+        $sql = "SELECT AVG(media_4_municipal) AS media_4 FROM aluno WHERE nome_escola = '$nome_escola' ";
         $sql_exec = $mysqli->query( $sql ) or die("". $mysqli->error);
         $media = $sql_exec->fetch_assoc();
         $media4 = $media["media_4"];
