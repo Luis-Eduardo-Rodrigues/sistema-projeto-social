@@ -140,6 +140,106 @@ if(isset($_POST['delete_aluno'])){
 
 }
 
+if(isset($_POST['adicionar_aluno'])) {
+    $nome_aluno     = trim($_POST['nome_aluno'] ?? '');
+    $cpf_aluno      = trim($_POST['cpf_aluno'] ?? '');
+    $codigo_tecnico = trim($_POST['codigo_tecnico'] ?? '');
+    $nome_escola    = trim($_POST['nome_escola'] ?? '');
+    $endereco_aluno = trim($_POST['endereco_aluno'] ?? '');
+    $ano            = trim($_POST['ano'] ?? '');
+
+    // validações
+    if (!preg_match('/^\d{11}$/', $cpf_aluno)) {
+        echo "<script>alert('Erro: CPF deve conter exatamente 11 dígitos.'); window.history.back();</script>";
+        exit;
+    }
+
+    if (!preg_match('/^\d{4}$/', $ano)) {
+        echo "<script>alert('Erro: Ano deve estar no formato YYYY (ex.: 2025).'); window.history.back();</script>";
+        exit;
+    }
+
+    if (!preg_match('/^\d{6,10}$/', $codigo_tecnico)) {
+        echo "<script>alert('Erro: Código Técnico deve ter entre 6 e 10 dígitos numéricos.'); window.history.back();</script>";
+        exit;
+    }
+
+    // valida duplicidade do código técnico
+    $verifica = $mysqli->prepare("SELECT COUNT(*) FROM aluno WHERE codigo_aluno = ?");
+    $verifica->bind_param("s", $codigo_tecnico);
+    $verifica->execute();
+    $verifica->bind_result($count);
+    $verifica->fetch();
+    $verifica->close();
+
+    if ($count > 0) {
+        echo "<script>alert('Erro: Código Técnico já cadastrado!'); window.history.back();</script>";
+        exit;
+    }
+
+    // consulta esfera da escola escolhida
+    $stmt_escola = $mysqli->prepare("SELECT esfera FROM escola WHERE nome_escola = ?");
+    $stmt_escola->bind_param("s", $nome_escola);
+    $stmt_escola->execute();
+    $stmt_escola->bind_result($esfera_escola);
+    $stmt_escola->fetch();
+    $stmt_escola->close();
+
+    if(!$esfera_escola) {
+        echo "<script>alert('Erro: Escola não encontrada na base de dados.'); window.history.back();</script>";
+        exit;
+    }
+
+    // define valores de acordo com a esfera
+    $esfera_aluno = $esfera_escola;
+    $nome_escola_final = null;
+    $nome_escola_medio = null;
+
+    if(strtolower($esfera_escola) === 'municipal'){
+        $nome_escola_final = $nome_escola;
+    } else {
+        $nome_escola_medio = $nome_escola;
+    }
+
+    // prepara inserção do aluno
+    $stmt = $mysqli->prepare("INSERT INTO aluno 
+        (nome_aluno, cpf_aluno, codigo_aluno, endereco_aluno, ano, esfera, nome_escola, nome_escola_medio) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+
+    if (!$stmt) {
+        echo "<script>alert('Erro ao preparar consulta: " . $mysqli->error . "'); window.history.back();</script>";
+        exit;
+    }
+
+    $stmt->bind_param("ssssssss", 
+        $nome_aluno, 
+        $cpf_aluno, 
+        $codigo_tecnico, 
+        $endereco_aluno, 
+        $ano, 
+        $esfera_aluno, 
+        $nome_escola_final, 
+        $nome_escola_medio
+    );
+
+    if ($stmt->execute()) {
+        // incrementa qtd_alunos na escola escolhida
+        $update_escola = $mysqli->prepare("UPDATE escola SET qtd_alunos = qtd_alunos + 1 WHERE nome_escola = ?");
+        $update_escola->bind_param("s", $nome_escola);
+        $update_escola->execute();
+        $update_escola->close();
+
+        echo "<script>alert('Aluno cadastrado com sucesso!'); window.location.href='adicionar_aluno.php';</script>";
+    } else {
+        if (strpos($stmt->error, 'Duplicate entry') !== false) {
+            echo "<script>alert('Erro: Código Técnico ou CPF já cadastrado!'); window.history.back();</script>";
+        } else {
+            echo "<script>alert('Erro ao cadastrar aluno: " . $stmt->error . "'); window.history.back();</script>";
+        }
+    }
+}
+
+
 
 
 ?>

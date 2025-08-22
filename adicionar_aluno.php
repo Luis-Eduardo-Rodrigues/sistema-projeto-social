@@ -35,24 +35,24 @@
         <div class="grid grid-cols-2 gap-10">
             <div class="flex flex-col gap-2">
                 <label>Nome:</label>
-                <input class="w-full rounded-md px-4 py-2 border border-gray-400" name="nome_aluno" type="text">
+                <input class="w-full rounded-md px-4 py-2 border border-gray-400" name="nome_aluno" type="text" maxlength="50" required>
             </div>
             <div class="flex flex-col gap-2">
                 <label>CPF:</label>
-                <input class="w-full rounded-md px-4 py-2 border border-gray-400" name="cpf_aluno" type="text">
+                <input class="w-full rounded-md px-4 py-2 border border-gray-400" name="cpf_aluno" type="text" inputmode="numeric" pattern="\d{11}" maxlength="11" required>
             </div>
             <div class="flex flex-col gap-2">
                 <label>Ano:</label>
-                <input class="w-full rounded-md px-4 py-2 border border-gray-400" name="ano_aluno" type="text">
+                <input pattern="\d{4}" maxlength="4" required class="w-full rounded-md px-4 py-2 border border-gray-400" name="ano" type="text">
             </div>
             <div class="flex flex-col gap-2">
                 <label>Código do Aluno:</label>
-                <input class="w-full rounded-md px-4 py-2 border border-gray-400" name="codigo_aluno" type="text">
+                <input class="w-full rounded-md px-4 py-2 border border-gray-400" name="codigo_tecnico" type="text" pattern="\d{6,10}" minlength="6" maxlength="10" required>
             </div>
             <div class="flex flex-col gap-2 col-span-2">
                 <label>Escola:</label>
-                <select name="escola" id="escola" class="w-full px-4 py-2 rounded-md border border-gray-400">
-                    <option selected value="<?=$aluno['nome_escola'];?>"><?=$aluno['nome_escola'];?></option>
+                <select name="nome_escola" required id="escola" class="w-full px-4 py-2 rounded-md border border-gray-400">
+                    <option selected>Escolha sua escolha</option>
                     <?php
                         $sql = "SELECT * FROM escola";
                         $escolas = mysqli_query($mysqli, $sql);
@@ -64,48 +64,8 @@
             </div>
         </div>
 
-        <h3 class="text-xl font-semibold text-center">Médias</h3>
-        <div class="grid grid-cols-4 gap-6">
-            <div class="flex flex-col gap-2">
-                <label>Média 1:</label>
-                <input class="rounded-md px-4 py-2 border border-gray-400" value="<?= $aluno['media_1'] ?>" name="media_1" type="text">
-            </div>
-            <div class="flex flex-col gap-2">
-                <label>Média 2:</label>
-                <input class="rounded-md px-4 py-2 border border-gray-400" value="<?= $aluno['media_2'] ?>" name="media_2" type="text">
-            </div>
-            <div class="flex flex-col gap-2">
-                <label>Média 3:</label>
-                <input class="rounded-md px-4 py-2 border border-gray-400" value="<?= $aluno['media_3'] ?>" name="media_3" type="text">
-            </div>
-            <div class="flex flex-col gap-2">
-                <label>Média 4:</label>
-                <input class="rounded-md px-4 py-2 border border-gray-400" value="<?= $aluno['media_4'] ?>" name="media_4" type="text">
-            </div>
-        </div>
-
-        <h3 class="text-xl font-semibold text-center">Frequência</h3>
-        <div class="grid grid-cols-4 gap-6">
-            <div class="flex flex-col gap-2">
-                <label>Frequência 1:</label>
-                <input class="rounded-md px-4 py-2 border border-gray-400" value="<?= $aluno['frequencia_1'] ?>" name="frequencia_1" type="text">
-            </div>
-            <div class="flex flex-col gap-2">
-                <label>Frequência 2:</label>
-                <input class="rounded-md px-4 py-2 border border-gray-400" value="<?= $aluno['frequencia_2'] ?>" name="frequencia_2" type="text">
-            </div>
-            <div class="flex flex-col gap-2">
-                <label>Frequência 3:</label>
-                <input class="rounded-md px-4 py-2 border border-gray-400" value="<?= $aluno['frequencia_3'] ?>" name="frequencia_3" type="text">
-            </div>
-            <div class="flex flex-col gap-2">
-                <label>Frequência 4:</label>
-                <input class="rounded-md px-4 py-2 border border-gray-400" value="<?= $aluno['frequencia_4'] ?>" name="frequencia_4" type="text">
-            </div>
-        </div>
-
         <div class="flex items-center justify-center gap-6 mt-6">
-            <button type="submit" name="add_aluno" class="px-6 py-3 rounded-md bg-green-700 hover:bg-green-800 text-white font-bold">Salvar</button>
+            <button type="submit" name="adicionar_aluno" class="px-6 py-3 rounded-md bg-green-700 hover:bg-green-800 text-white font-bold">Salvar</button>
             <a href="aluno.php" class="px-6 py-3 rounded-md bg-red-700 hover:bg-red-800 text-white font-bold">Voltar</a>
         </div>
     </form>

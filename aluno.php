@@ -110,8 +110,8 @@
             </div>
             
             <div class="bottom-0 right-16 w-full p-6 text-end">
-                <button class="position:fixed bg-[#4bac72] hover:bg-green-700 text-black font-bold px-4 py-2 rounded cursor-pointer">Adicionar Aluno</button>
-                <button class="position:fixed bg-[#edd542] hover:bg-yellow-700 text-black font-bold px-4 py-2 rounded cursor-pointer">Salvar</button>
+                <a href="adicionar_aluno.php" class="position:fixed bg-[#4bac72] hover:bg-green-700 text-black font-bold px-4 py-2 rounded cursor-pointer">Adicionar Aluno</a>
+                <a href="secretaria.php" class="position:fixed bg-[#edd542] hover:bg-yellow-700 text-black font-bold px-4 py-2 rounded cursor-pointer">Sair</a>
             </div>
         </section>
     </main>
