@@ -234,40 +234,46 @@ $frequenciaGauge = isset($kpis['frequencia']) ? (float)$kpis['frequencia'] : 0;
         </button>
     </header>
 
-
-    <!-- Overlay -->
     <div id="overlay" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-40" onclick="toggleMenu()"></div>
 
-    <!-- Menu lateral -->
-    <div id="sidebar" class="fixed top-0 right-0 h-full w-64 bg-gradient-to-b from-[#4bac72] via-[#4bac72] to-[#EDD542] shadow-lg transform translate-x-full transition-transform duration-300 flex flex-col p-4 z-50">
-    <button onclick="toggleMenu()" class="self-end mb-4 text-white text-xl font-bold cursor-pointer">✕</button>
+    <div id="sidebar" 
+     class="fixed top-0 right-0 h-full w-64 bg-gradient-to-b from-[#4bac72] via-[#4bac72] to-[#EDD542] 
+            shadow-lg transform translate-x-full transition-transform duration-300 flex flex-col p-4 z-50">
+
+    <button onclick="toggleMenu()" 
+class="self-end mb-6 text-white text-2xl font-bold cursor-pointer hover:text-red-500 transition">
+        ✕
+    </button>
+
     <?php
         $menu = [
             ['Aluno', '<i class="fa-solid fa-graduation-cap"></i>', 'aluno.php'],
             ['Escola', '<i class="fa-solid fa-school"></i>', 'escola.php'],
-            ['Coordenador', '<i class="fa-solid fa-user"></i>', 'acoescoordenador.php'],
-            ['Montar Relatório', '<i class="fa-solid fa-file-lines"></i>', 'relatorio.php']
+            ['Coordenador', '<i class="fa-solid fa-user"></i>', 'coordenador.php'],
+            ['Montar Relatório', '<i class="fa-solid fa-file-lines"></i>', 'relatorio.php'] 
         ];
+
         foreach ($menu as $item) {
-            echo '<a href="' . $item[2] . '" class="flex justify-between items-center w-full bg-white rounded-lg p-3 mb-2 hover:bg-gray-100 cursor-pointer">';
+            echo '<a href="' . $item[2] . '" 
+                     class="flex items-center gap-3 w-full bg-white rounded-lg p-3 mb-3 text-gray-700 font-medium 
+                            hover:bg-green-100 hover:text-green-700 cursor-pointer shadow-sm transition">';
+            echo $item[1];
             echo '<span>' . $item[0] . '</span>';
-            echo '<span>' . $item[1] . '</span>';
-            echo '<span>' . $item[3] . '</span>';
             echo '</a>';
         }
     ?>
-    
-    <!-- Botão de Logout -->
-    <a href="logout.php" class="flex justify-center items-center w-full bg-red-600 text-white font-semibold rounded-lg p-3 mt-auto hover:bg-red-700 cursor-pointer shadow-md">
+
+    <a href="logout.php" 
+       class="flex justify-center items-center w-full bg-red-600 text-white font-semibold rounded-lg p-3 mt-auto 
+              hover:bg-red-700 cursor-pointer shadow-md transition">
         <i class="fa-solid fa-right-from-bracket mr-2"></i> Sair
     </a>
 </div>
-    </div>
+
 
     <main class="m-5">
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:col-span-3">
-                <!-- Cards -->
                 <div class="bg-white rounded-xl shadow p-4">
                     <div class="text-gray-500">Quantidade de Bolsistas</div>
                     <div class="text-3xl font-bold"><?= $kpis['bolsistas'] ?></div>
@@ -287,8 +293,6 @@ $frequenciaGauge = isset($kpis['frequencia']) ? (float)$kpis['frequencia'] : 0;
                 </div>
             </div>
         </div>
-
-        <!-- Lista de escolas -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <div id="chart_geo" class="bg-white rounded-xl shadow p-2 h-96 col-span-2"></div>
             <div class="bg-white rounded-xl shadow p-4">
