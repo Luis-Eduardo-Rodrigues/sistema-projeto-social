@@ -15,6 +15,7 @@ $nome_aluno     = trim($_POST['nome_aluno'] ?? '');
 $cpf_aluno      = trim($_POST['cpf_aluno'] ?? '');
 $numero_tecnico = trim($_POST['codigo_tecnico'] ?? '');
 $nome_escola    = trim($_POST['nome_escola'] ?? '');
+
 $ano            = trim($_POST['ano'] ?? '');
 
 if (!preg_match('/^\d{11}$/', $cpf_aluno)) {

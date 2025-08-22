@@ -13,7 +13,7 @@
 
     <div id="msg" class="hidden mb-4 p-3 rounded-lg"></div>
 
-    <form id="formAluno" class="grid grid-cols-1 md:grid-cols-2 gap-4" method="POST" action="salvar_aluno.php" novalidate>
+    <form id="formAluno" class="grid grid-cols-1 md:grid-cols-2 gap-4" method="POST" action="acoes.php" novalidate>
 
       <div class="md:col-span-2">
         <label class="block text-sm font-medium mb-1" for="nome_aluno">Nome do aluno</label>
@@ -52,12 +52,17 @@
       </div>
 
       <div class="md:col-span-2">
+        <label class="block text-sm font-medium mb-1" for="ano">Endereço</label>
+        <input id="endereco_aluno" name="endereco_aluno" type="text" required class="w-full border rounded-xl p-2.5 focus:outline-none focus:ring-2">
+      </div>
+
+      <div class="md:col-span-2">
         <label class="block text-sm font-medium mb-1" for="ano">Ano</label>
         <input id="ano" name="ano" type="text" pattern="\d{4}" maxlength="4" required class="w-full border rounded-xl p-2.5 focus:outline-none focus:ring-2">
       </div>
 
       <div class="md:col-span-2 flex items-center gap-3 mt-2">
-        <button type="submit" class="px-5 py-2.5 rounded-2xl bg-blue-600 text-white font-semibold hover:bg-blue-700">Salvar</button>
+        <button type="submit" name="adicionar_aluno" class="px-5 py-2.5 rounded-2xl bg-blue-600 text-white font-semibold hover:bg-blue-700">Salvar</button>
         <button type="reset" class="px-5 py-2.5 rounded-2xl bg-gray-200 text-gray-800 hover:bg-gray-300">Limpar</button>
       </div>
     </form>
