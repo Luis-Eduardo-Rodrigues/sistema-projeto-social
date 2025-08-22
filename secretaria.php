@@ -249,7 +249,7 @@ class="self-end mb-6 text-white text-2xl font-bold cursor-pointer hover:text-red
         $menu = [
             ['Aluno', '<i class="fa-solid fa-graduation-cap"></i>', 'aluno.php'],
             ['Escola', '<i class="fa-solid fa-school"></i>', 'escola.php'],
-            ['Coordenador', '<i class="fa-solid fa-user"></i>', 'coordenador.php'],
+            ['Coordenador', '<i class="fa-solid fa-user"></i>', 'coordenadores.php'],
             ['Montar Relatório', '<i class="fa-solid fa-file-lines"></i>', 'relatorio.php'] 
         ];
 

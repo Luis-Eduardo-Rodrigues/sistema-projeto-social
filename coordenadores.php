@@ -35,12 +35,11 @@
                                 <th class="p-4 text-left">CPF</th>
                                 <th class="p-4 text-left">ESCOLA</th>
                                 <th class="p-4 text-left">USUÁRIO</th>
-                                <th class="p-4 text-left">SENHA</th>
+                                <th class="p-4 text-left">ESFERA</th>
                                 <th class="p-4 text-left">AÇÕES</th>
                             </tr>
                         </thead>
-
-
+                        
                         <tbody>
                             <?php
                                 while ($aluno = $query_alunos_exec->fetch_assoc()) {
@@ -52,7 +51,7 @@
                                 <td class="p-4"><?= $aluno['cpf'] ?></td>
                                 <td class="p-4"><?= $aluno['nome_escola'] ?></td>
                                 <td class="p-4"><?= $aluno['usuario'] ?></td>
-                                <td class="p-4"><?= $aluno['senha'] ?></td>
+                                <td class="p-4"><?= $aluno['esfera'] ?></td>
                                 <td class="display-flex p-4">
                                     <button class="bg-[#edd542] hover:bg-yellow-600 text-black font-bold px-4 py-2 p-6 rounded cursor-pointer">Editar</button>
                                     <button class="bg-[#cc3732] hover:bg-red-700 text-black font-bold px-4 py-2 p-6 rounded cursor-pointer">Excluir</button>
@@ -66,14 +65,10 @@
                     <div class="flex justify-center gap-2 my-4">
                         <?php
                             for($p=1;$p<=$numero_pagina;$p++){
-                                echo "<a href='?pagina={$p}'>[{$p}]</a>";
+                                echo "<a class='px-4 py-2 rounded-full border bg-green-800 text-white font-bold' href='?pagina={$p}'>{$p}</a>";
 
                             } 
                         ?>
-                        <button class="w-10 h-10 rounded-full border border-green-800 bg-green-800 text-white font-bold">1</button>
-                        <button class="w-10 h-10 rounded-full border border-green-800 text-green-800 font-bold">2</button>
-                        <button class="w-10 h-10 rounded-full border border-green-800 text-green-800 font-bold">3</button>
-                        <button class="w-10 h-10 rounded-full border border-green-800 text-green-800 font-bold">4</button>
                     </div>
                 </div>
             </div>
