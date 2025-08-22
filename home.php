@@ -167,14 +167,19 @@
     </script>
 
 
-    <!-- Calendário -->
     <section class="container mx-auto px-4 py-8">
-        <h2 class="text-2xl font-bold text-center text-[#279E5E] mb-6">CALENDÁRIO DE PAGAMENTOS – PÉ DE MEIA MUNICIPAL</h2>
+        <h2 class="text-2xl font-bold text-center text-[#279E5E] mb-6">
+            CALENDÁRIO DE PAGAMENTOS – PÉ DE MEIA MUNICIPAL
+        </h2>
 
         <div class="grid md:grid-cols-2 gap-8">
-            <!-- Calendário em grade -->
+
             <div class="bg-white shadow rounded-xl p-6 border border-gray-200">
-                <h3 id="calendar-title" class="text-lg font-semibold text-center mb-4"></h3>
+                <div class="flex justify-between mb-4 items-center">
+                    <button id="prev" class="px-3 py-1 bg-gray-200 rounded">◀</button>
+                    <h3 id="calendar-title" class="text-lg font-semibold text-center"></h3>
+                    <button id="next" class="px-3 py-1 bg-gray-200 rounded">▶</button>
+                </div>
                 <div id="calendar-grid" class="grid grid-cols-7 gap-2 text-center text-sm"></div>
             </div>
 
@@ -211,31 +216,15 @@
         </div>
     </footer>
 
-    <!-- SwiperJS -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
-        const swiper = new Swiper('.swiper', {
-            loop: true,
-            pagination: {
-                el: '.swiper-pagination',
-                clickable: true
-            },
-        });
+        let mes = new Date().getMonth(); 
+        let ano = new Date().getFullYear();
 
-        // -------- Calendário Automático --------
-        const mes = 8;
-        const ano = 2025;
         const calendarTitle = document.getElementById("calendar-title");
         const calendarGrid = document.getElementById("calendar-grid");
 
-        // Cabeçalho
         const weekDays = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sab", "Dom"];
-        weekDays.forEach(d => {
-            const div = document.createElement("div");
-            div.textContent = d;
-            div.classList.add("font-bold");
-            calendarGrid.appendChild(div);
-        });
 
         function gerarCalendario(diasPagamento) {
             calendarTitle.textContent = new Date(ano, mes).toLocaleString("pt-BR", {
@@ -243,17 +232,24 @@
                 year: "numeric"
             });
 
+            calendarGrid.innerHTML = "";
+
+            weekDays.forEach(d => {
+                const div = document.createElement("div");
+                div.textContent = d;
+                div.classList.add("font-bold");
+                calendarGrid.appendChild(div);
+            });
+
             const primeiroDiaSemana = new Date(ano, mes, 1).getDay();
             const diasNoMes = new Date(ano, mes + 1, 0).getDate();
             const offset = (primeiroDiaSemana + 6) % 7;
 
-            // espaços antes do primeiro dia
             for (let i = 0; i < offset; i++) {
                 const vazio = document.createElement("div");
                 calendarGrid.appendChild(vazio);
             }
 
-            // dias do mês
             for (let d = 1; d <= diasNoMes; d++) {
                 const dia = document.createElement("div");
                 dia.textContent = d;
@@ -265,20 +261,36 @@
             }
         }
 
-        // Simulação de API
+        document.getElementById("prev").addEventListener("click", () => {
+            mes--;
+            if (mes < 0) {
+                mes = 11;
+                ano--;
+            }
+            carregarPagamentos();
+        });
+
+        document.getElementById("next").addEventListener("click", () => {
+            mes++;
+            if (mes > 11) {
+                mes = 0;
+                ano++;
+            }
+            carregarPagamentos();
+        });
+
+        // ---------- API Simulada ----------
         async function carregarPagamentos() {
-            // Aqui você pode trocar pelo seu endpoint real
-            // Ex: const res = await fetch("/api/pagamentos?mes=9&ano=2025");
-            // const data = await res.json();
+            // Aqui você pode integrar sua API real
+            // Por enquanto, fake: destaca dias 10 e 20 de qualquer mês
             const data = {
-                dias: [10, 20]
-            }; // Fake API
+                dias: [10, 11, 12, 13, 14, 15]
+            };
             gerarCalendario(data.dias);
         }
-
         carregarPagamentos();
     </script>
-</body>
 
+</body>
 
 </html>
