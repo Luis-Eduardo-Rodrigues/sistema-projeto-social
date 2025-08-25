@@ -286,7 +286,158 @@ if(isset($_POST['adicionar_escola'])) {
     }
 }
 
+if (isset($_GET['id_escola'])) {
+    $id = (int)$_GET['id_escola']; 
+
+
+    mysqli_begin_transaction($mysqli);
+
+
+    $sql1 = "DELETE FROM aluno WHERE id_escola = $id";
+    $result1 = mysqli_query($mysqli, $sql1);
+
+    if (!$result1) {
+        mysqli_rollback($mysqli);
+        die("Erro ao deletar alunos: " . mysqli_error($mysqli));
+    }
+
+ 
+    $sql2 = "DELETE FROM escola WHERE id_escola = $id";
+    $result2 = mysqli_query($mysqli, $sql2);
+
+    if (!$result2) {
+        mysqli_rollback($mysqli);
+        die("Erro ao deletar escola: " . mysqli_error($mysqli));
+    }
+
+   
+    mysqli_commit($mysqli);
+
+    
+    header("Location:");
+    exit;
 }
+
+
+
+
+if(isset($_POST['update_escola'])){
+    echo "<h1>Deu certo</h1>";
+    $id_escola = mysqli_real_escape_string($mysqli,$_POST['id_escola']);
+    $endereco_escola = mysqli_real_escape_string($mysqli,trim($_POST['endereco_escola']));
+    $nome_escola = mysqli_real_escape_string($mysqli,$_POST['nome_escola']);
+
+    echo "<script>alert('$id_escola $nome_escola $endereco_escola');</script>";
+    
+
+    $queryescola = "SELECT nome_escola FROM aluno WHERE id_escola = '$id_escola'";
+    $queryescolaexec = $mysqli->query($queryescola);
+    $escola = $queryescolaexec->fetch_assoc();
+    $escolaantes = $escola["nome_escola"];
+    $enderecoantes = $escola["endereco_escola"];
+
+    if($escolaantes != $nome_escola) {
+        $sql_update =  "UPDATE escola 
+            SET nome_escola = '$nome_escola' 
+            WHERE id_escola = '$id_escola'";
+
+        $mysqli->query($sql_update) or die("Falha na execução do código SQL: " . $mysqli->error);
+
+        $sql_update =  "UPDATE aluno 
+            SET nome_escola = '$nome_escola' 
+            WHERE nome_escola = '$escolaantes'";
+
+        $mysqli->query($sql_update) or die("Falha na execução do código SQL: " . $mysqli->error);
+    }
+
+    if ($enderecoantes != $endereco_escola) {
+        $queryUpdate = "UPDATE escola SET endereco_escola = '$endereco_escola' WHERE id_escola = '$id_escola'" ;
+
+        $consultaaluno = mysqli_query($mysqli, $queryUpdate);
+    }
+
+    if(mysqli_affected_rows($mysqli) > 0){
+        $_SESSION["msgupescola"] = "Escola atualizada";
+        header('Location: escola.php');
+    }else{
+        $_SESSION["msgupescola"] = "Escola não atualizada";
+        header('Location: escola.php');
+    }
+    
+}}
+if(isset($_POST['update_escola'])){
+
+    $id_escola = mysqli_real_escape_string($mysqli,$_POST['id_escola']);
+    $endereco_escola = mysqli_real_escape_string($mysqli,trim($_POST['endereco_escola']));
+    $nome_escola = mysqli_real_escape_string($mysqli,$_POST['nome_escola']);    
+
+    $queryescola = "SELECT nome_escola FROM escola WHERE id_escola = '$id_escola'";
+    $queryescolaexec = $mysqli->query($queryescola);
+    $escola = $queryescolaexec->fetch_assoc();
+    $escolaantes = $escola["nome_escola"];
+    $enderecoantes = $escola["endereco_escola"];
+
+    if($escolaantes != $nome_escola) {
+        $sql_update =  "UPDATE escola 
+            SET nome_escola = '$nome_escola' 
+            WHERE id_escola = '$id_escola'";
+
+        $mysqli->query($sql_update) or die("Falha na execução do código SQL: " . $mysqli->error);
+
+        $sql_update =  "UPDATE aluno 
+            SET nome_escola = '$nome_escola' 
+            WHERE nome_escola = '$escolaantes'";
+
+        $mysqli->query($sql_update) or die("Falha na execução do código SQL: " . $mysqli->error);
+    }
+
+    if ($enderecoantes != $endereco_escola) {
+        $queryUpdate = "UPDATE escola SET endereco_escola = '$endereco_escola' WHERE id_escola = '$id_escola'" ;
+
+        $consultaaluno = mysqli_query($mysqli, $queryUpdate);
+    }
+
+    if(mysqli_affected_rows($mysqli) > 0){
+        $_SESSION["msgupescola"] = "Escola atualizada";
+        header('Location: escola.php');
+    }else{
+        $_SESSION["msgupescola"] = "Escola não atualizada";
+        header('Location: escola.php');
+    }
+    
+}
+
+if(isset($_POST['delete_escola'])){
+    $id_escola = mysqli_real_escape_string($mysqli, $_POST['delete_escola']);
+    $sql = "SELECT nome_escola FROM escola WHERE id_escola = '$id_escola'";
+
+    $query = $mysqli->query($sql) or die("Falha na execução do código SQL: " . $mysqli->error);
+   
+    $sqlDelete = mysqli_query($mysqli, "DELETE FROM escola WHERE id_escola = {$id_escola}")
+    or die (mysqli_error($connection));
+
+    if(mysqli_affected_rows($mysqli) > 0){
+
+            $dados = $query->fetch_assoc(); 
+            $escola = $dados['nome_escola'];
+
+            $sql_aluno = "DELETE FROM aluno WHERE nome_escola = '$escola'";
+            $query_escola = $mysqli->query($sql_aluno) or die( "". $mysqli->error);
+
+            $_SESSION['message_escola'] = "Escola deletada";
+                    
+            header('Location: escola.php');
+            exit;
+        }else{
+            $_SESSION['message_escola'] = "Escola não deletada";
+            header('Location: escola.php');
+            exit;
+        }
+    
+
+}
+
+
 
 
 
