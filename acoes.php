@@ -239,6 +239,55 @@ if(isset($_POST['adicionar_aluno'])) {
     }
 }
 
+if(isset($_POST['adicionar_escola'])) {
+    if (isset($_POST['adicionar_escola'])) {
+    $nome_escola     = trim($_POST['nome_escola'] ?? '');
+    $endereco_escola = trim($_POST['endereco_escola'] ?? '');
+    $esfera          = trim($_POST['esfera'] ?? '');
+
+    // Verifica se já existe a escola cadastrada
+    $check = $mysqli->prepare("SELECT id_escola FROM escola WHERE nome_escola = ? AND endereco_escola = ? AND esfera = ?");
+    if (!$check) {
+        echo "<script>alert('Erro ao preparar verificação: " . $mysqli->error . "'); window.history.back();</script>";
+        exit;
+    }
+
+    $check->bind_param("sss", $nome_escola, $endereco_escola, $esfera);
+    $check->execute();
+    $check->store_result();
+
+    if ($check->num_rows > 0) {
+        // Já existe escola cadastrada
+        echo "<script>alert('Escola já cadastrada!'); window.location.href='adicionar_escola.php';</script>";
+        exit;
+    }
+    $check->close();
+
+    // prepara inserção da escola
+    $stmt = $mysqli->prepare("INSERT INTO escola 
+        (nome_escola, endereco_escola, esfera) 
+        VALUES (?, ?, ?)");
+
+    if (!$stmt) {
+        echo "<script>alert('Erro ao preparar consulta: " . $mysqli->error . "'); window.history.back();</script>";
+        exit;
+    }
+
+    $stmt->bind_param("sss", 
+        $nome_escola, 
+        $endereco_escola, 
+        $esfera
+    );
+
+    if ($stmt->execute()) {
+        echo "<script>alert('Escola cadastrada com sucesso!'); window.location.href='adicionar_coordenador.php';</script>";
+    } else {
+        echo "<script>alert('Erro ao cadastrar escola: " . $stmt->error . "'); window.history.back();</script>";
+    }
+}
+
+}
+
 
 
 
