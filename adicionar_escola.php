@@ -28,8 +28,6 @@
     </header>
 
     <form action="acoes.php" method="POST" class="max-w-6xl mx-auto bg-white shadow-lg rounded-xl p-12 flex flex-col gap-10">
-        <input type="hidden" name="aluno_id">
-
         <h2 class="text-3xl font-bold text-center">Adicionar Escola</h2>
 
         <div class="grid grid-cols-2 gap-10">
@@ -43,7 +41,7 @@
             </div>
             <div class="flex flex-col gap-2">
                 <label>Esfera:</label>
-                <select name="escola" id="escola" class="w-full px-4 py-2 rounded-md border border-gray-400">
+                <select name="esfera" id="escola" class="w-full px-4 py-2 rounded-md border border-gray-400">
                     <option selected value="Selecione a esfera"></option>
                     <option value="Municipal">Municipal</option>
                     <option value="Estadual">Estadual</option>
@@ -53,8 +51,8 @@
         </div>
 
         <div class="flex items-center justify-center gap-6 mt-6">
-            <button type="submit" name="adicionar_aluno" class="px-6 py-3 rounded-md bg-green-700 hover:bg-green-800 text-white font-bold">Salvar</button>
-            <a href="secretaria.php" class="px-6 py-3 rounded-md bg-red-700 hover:bg-red-800 text-white font-bold">Voltar</a>
+            <button type="submit" name="adicionar_escola" class="px-6 py-3 rounded-md bg-green-700 hover:bg-green-800 text-white font-bold">Salvar</button>
+            <a href="escola.php" class="px-6 py-3 rounded-md bg-red-700 hover:bg-red-800 text-white font-bold">Voltar</a>
         </div>
     </form>
 </body>

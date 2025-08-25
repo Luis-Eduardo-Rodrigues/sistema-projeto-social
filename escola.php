@@ -21,7 +21,7 @@ include("protects.php");
     $numero_pagina = ceil($count_escola / $limit);
 
 
-    $query_escola = "SELECT * FROM escola";
+    $query_escola = "SELECT * FROM escola ORDER BY nome_escola ASC LIMIT {$limit} OFFSET {$offset}";
     $query_escola_exec = $mysqli->query($query_escola) or die($mysqli->error);
     
 ?>
@@ -59,22 +59,20 @@ include("protects.php");
                             <tr class="border-b border-green-600 bg-green-100">
                                 <th class="p-4 text-left">NOME</th>
                                 <th class="p-4 text-left">ENDEREÇO</th>
+                                <th class="p-4 text-left">ESFERA</th>
                                 <th class="p-4 text-left">QUANTIDADE DE ALUNOS</th>
-                                <th class="p-4 text-left">AÇÕES</th>
+                                <th class="p-4 text-center">AÇÕES</th>
                             </tr>
                         </thead>
-
-
                         <tbody>
                             <?php
-                                while ($escola = $query_escola_exec->fetch_assoc()) {
-                                    
-                                
+                                while ($escola = $query_escola_exec->fetch_assoc()) {    
                             ?>
                             <tr class="border-b hover:bg-green-50">
                                 <td class="p-4 cursor-pointer"><?= $escola['nome_escola'] ?></td>
                                 <td class="p-4"><?= $escola['endereco_escola'] ?></td>
-                                <td class="p-4"><?= $escola['qtd_alunos'] ?></td>
+                                <td class="p-4"><?= $escola['esfera'] ?></td>
+                                <td class="p-4 text-center"><?= $escola['qtd_alunos'] ?></td>
                                 <td class="display-flex p-4">
                                     <button class="bg-[#edd542] hover:bg-yellow-600 text-black font-bold px-4 py-2 p-6 rounded cursor-pointer">Editar</button>
                                     <button class="bg-[#cc3732] hover:bg-red-700 text-black font-bold px-4 py-2 p-6 rounded cursor-pointer">Excluir</button>
@@ -85,20 +83,19 @@ include("protects.php");
                             ?>
                         </tbody>
                     </table>
-                    <div class="flex justify-center gap-2 my-4">
+                    <div class="flex justify-center gap-2 my-4 relative">
                         <?php
                             for($p=1;$p<=$numero_pagina;$p++){
                                 echo "<a class='px-4 py-2 rounded-full border text-center border-green-800 bg-green-800 text-white font-bold' href='?pagina={$p}'>{$p}</a>";
 
                             } 
                         ?>
+                        <div class="absolute bottom-0 right-0 w-full mr-6 text-end">
+                    <a href="adicionar_escola.php" class="position:fixed bg-[#4bac72] hover:bg-green-700 text-black font-bold px-4 py-2 rounded cursor-pointer">Adicionar Escola</a>
+                    <a href="secretaria.php" class="position:fixed bg-[#cc3732] hover:bg-red-700 text-black font-bold px-4 py-2 rounded cursor-pointer">Sair</a>
+                </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="fixed bottom-0 left-0 w-full p-6 text-end">
-                <button class="position:fixed bg-[#4bac72] hover:bg-green-700 text-black font-bold px-4 py-2 rounded cursor-pointer">Adicionar Escola</button>
-                <button class="position:fixed bg-[#edd542] hover:bg-yellow-700 text-black font-bold px-4 py-2 rounded cursor-pointer">Salvar</button>
             </div>
 
         </section>
