@@ -285,6 +285,7 @@ if(isset($_POST['adicionar_escola'])) {
         echo "<script>alert('Erro ao cadastrar escola: " . $stmt->error . "'); window.history.back();</script>";
     }
 }
+}
 
 if (isset($_GET['id_escola'])) {
     $id = (int)$_GET['id_escola']; 
@@ -318,60 +319,13 @@ if (isset($_GET['id_escola'])) {
     exit;
 }
 
-
-
-
-if(isset($_POST['update_escola'])){
-    echo "<h1>Deu certo</h1>";
-    $id_escola = mysqli_real_escape_string($mysqli,$_POST['id_escola']);
-    $endereco_escola = mysqli_real_escape_string($mysqli,trim($_POST['endereco_escola']));
-    $nome_escola = mysqli_real_escape_string($mysqli,$_POST['nome_escola']);
-
-    echo "<script>alert('$id_escola $nome_escola $endereco_escola');</script>";
-    
-
-    $queryescola = "SELECT nome_escola FROM aluno WHERE id_escola = '$id_escola'";
-    $queryescolaexec = $mysqli->query($queryescola);
-    $escola = $queryescolaexec->fetch_assoc();
-    $escolaantes = $escola["nome_escola"];
-    $enderecoantes = $escola["endereco_escola"];
-
-    if($escolaantes != $nome_escola) {
-        $sql_update =  "UPDATE escola 
-            SET nome_escola = '$nome_escola' 
-            WHERE id_escola = '$id_escola'";
-
-        $mysqli->query($sql_update) or die("Falha na execução do código SQL: " . $mysqli->error);
-
-        $sql_update =  "UPDATE aluno 
-            SET nome_escola = '$nome_escola' 
-            WHERE nome_escola = '$escolaantes'";
-
-        $mysqli->query($sql_update) or die("Falha na execução do código SQL: " . $mysqli->error);
-    }
-
-    if ($enderecoantes != $endereco_escola) {
-        $queryUpdate = "UPDATE escola SET endereco_escola = '$endereco_escola' WHERE id_escola = '$id_escola'" ;
-
-        $consultaaluno = mysqli_query($mysqli, $queryUpdate);
-    }
-
-    if(mysqli_affected_rows($mysqli) > 0){
-        $_SESSION["msgupescola"] = "Escola atualizada";
-        header('Location: escola.php');
-    }else{
-        $_SESSION["msgupescola"] = "Escola não atualizada";
-        header('Location: escola.php');
-    }
-    
-}}
 if(isset($_POST['update_escola'])){
 
     $id_escola = mysqli_real_escape_string($mysqli,$_POST['id_escola']);
     $endereco_escola = mysqli_real_escape_string($mysqli,trim($_POST['endereco_escola']));
     $nome_escola = mysqli_real_escape_string($mysqli,$_POST['nome_escola']);    
 
-    $queryescola = "SELECT nome_escola FROM escola WHERE id_escola = '$id_escola'";
+    $queryescola = "SELECT nome_escola, endereco_escola FROM escola WHERE id_escola = '$id_escola'";
     $queryescolaexec = $mysqli->query($queryescola);
     $escola = $queryescolaexec->fetch_assoc();
     $escolaantes = $escola["nome_escola"];
@@ -389,21 +343,30 @@ if(isset($_POST['update_escola'])){
             WHERE nome_escola = '$escolaantes'";
 
         $mysqli->query($sql_update) or die("Falha na execução do código SQL: " . $mysqli->error);
+
+        $sql_update =  "UPDATE usuario 
+            SET nome_escola = '$nome_escola' 
+            WHERE nome_escola = '$escolaantes'";
+
+        $mysqli->query($sql_update) or die("Falha na execução do código SQL: " . $mysqli->error);
+
     }
 
     if ($enderecoantes != $endereco_escola) {
         $queryUpdate = "UPDATE escola SET endereco_escola = '$endereco_escola' WHERE id_escola = '$id_escola'" ;
 
         $consultaaluno = mysqli_query($mysqli, $queryUpdate);
+
     }
 
     if(mysqli_affected_rows($mysqli) > 0){
         $_SESSION["msgupescola"] = "Escola atualizada";
         header('Location: escola.php');
     }else{
-        $_SESSION["msgupescola"] = "Escola não atualizada";
-        header('Location: escola.php');
+            $_SESSION["msgupescola"] = "Escola não atualizada";
+            header('Location: escola.php');
     }
+
     
 }
 
@@ -435,6 +398,64 @@ if(isset($_POST['delete_escola'])){
         }
     
 
+}
+
+if(isset($_POST['add_coordenador'])){
+
+    $usuario       = trim($_POST['usuario'] ?? '');
+    $senha         = trim($_POST['senha'] ?? '');
+    $nome_escola   = trim($_POST['nome_escola'] ?? '');
+    $cpf           = trim($_POST['cpf'] ?? '');
+    $nome_usuario  = trim($_POST['nome_usuario'] ?? '');
+    $cargo         = trim($_POST['cargo'] ?? '');
+
+    if (!$usuario || !$senha || !$nome_escola || !$cpf || !$nome_usuario || !$cargo) {
+        echo "<script>alert('Todos os campos são obrigatórios.'); window.history.back();</script>";
+        exit;
+    }
+
+    if (!preg_match('/^\d{11}$/', $cpf)) {
+        echo "<script>alert('CPF deve ter 11 dígitos.'); window.history.back();</script>";
+        exit;
+    }
+
+    $stmt = $mysqli->prepare("SELECT 1 FROM usuario WHERE usuario = ? OR cpf = ?");
+    if (!$stmt) {
+        echo "<script>alert('Erro ao preparar SELECT: ".$mysqli->error."'); window.history.back();</script>";
+        exit;
+    }
+    $stmt->bind_param("ss", $usuario, $cpf);
+    $stmt->execute();
+    $stmt->store_result();
+    if ($stmt->num_rows > 0) {
+        echo "<script>alert('Usuário ou CPF já cadastrado.'); window.history.back();</script>";
+        $stmt->close();
+        $mysqli->close();
+        exit;
+    }
+    $stmt->close();
+
+    $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
+
+    $stmt = $mysqli->prepare("
+        INSERT INTO usuario (usuario, senha, nome_escola, cpf, nome_usuario, cargo)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ");
+    if (!$stmt) {
+        echo "<script>alert('Erro ao preparar INSERT: ".$mysqli->error."'); window.history.back();</script>";
+        exit;
+    }
+
+    $stmt->bind_param("ssssss", $usuario, $senha_hash, $nome_escola, $cpf, $nome_usuario, $cargo);
+
+    if ($stmt->execute()) {
+        echo "<script>alert('Coordenador cadastrado com sucesso!'); window.location.href='adicionar_coordenador.php';</script>";
+    } else {
+        echo "<script>alert('Erro ao cadastrar coordenador: ".$stmt->error."'); window.history.back();</script>";
+    }
+
+    $stmt->close();
+    $mysqli->close();
 }
 
 

@@ -5,52 +5,96 @@ ini_set('display_errors', 1);
 include "conn.php";
 include "protects.php";
 
-
 $sql_escolas = "SELECT nome_escola FROM escola";
 $sql_escolas_exec = $mysqli->query($sql_escolas) or die("Falha na consulta SQL". $mysqli->error);
 
-while($escola = $sql_escolas_exec->fetch_assoc()){
+while ($escola = $sql_escolas_exec->fetch_assoc()) {
     $nome_escola = $escola["nome_escola"];
-    
-    $query_coord = "SELECT bimestre FROM usuario WHERE nome_escola = '$nome_escola'";
-    $query_coord_exec = $mysqli->query( $query_coord ) or die("Falha na consulta SQL". $mysqli->error);
+
+    // pega esfera da escola
+    $sqlEsfera = "SELECT esfera FROM escola WHERE nome_escola = '$nome_escola' LIMIT 1";
+    $resEsfera = $mysqli->query($sqlEsfera);
+    $rowEsfera = $resEsfera->fetch_assoc();
+    $esfera = $rowEsfera ? $rowEsfera['esfera'] : null;
+
+    // pega bimestre do coordenador
+    $query_coord = "SELECT bimestre FROM usuario WHERE nome_escola = '$nome_escola' LIMIT 1";
+    $query_coord_exec = $mysqli->query($query_coord);
     $bimestre = $query_coord_exec->fetch_assoc();
 
-    if($bimestre['bimestre'] == 1) {
-        $sql = "SELECT AVG(media_1_municipal) AS media_1 FROM aluno WHERE nome_escola = '$nome_escola' ";
-        $sql_exec = $mysqli->query($sql) or die("". $mysqli->error);
-        $media = $sql_exec->fetch_assoc();
-        $media1 = $media["media_1"];
+    if (!$bimestre || !isset($bimestre['bimestre'])) {
+        continue; // sem coordenador → pula a escola
+    }
 
-        $sql_up = "UPDATE escola SET media_total1 = '$media1' WHERE nome_escola = '$nome_escola'";
-        $sql_up_exec = $mysqli->query( $sql_up ) or die("". $mysqli->error);
+    $b = (int)$bimestre['bimestre'];
 
-    }elseif($bimestre['bimestre'] == 2) {
-        $sql = "SELECT AVG(media_2_municipal) AS media_2 FROM aluno WHERE nome_escola = '$nome_escola' ";
-        $sql_exec = $mysqli->query( $sql ) or die("". $mysqli->error);
-        $media = $sql_exec->fetch_assoc();
-        $media2 = $media["media_2"];
+    if ($esfera === "Municipal") {
+        // lógica municipal (mesma da sua, corrigida)
+        $anoSistema     = date('Y');
+        $colMedia = "media_{$b}_municipal";
+        $colFreq  = "frequencia_{$b}_municipal";
 
-        $sql_up = "UPDATE escola SET media_total2 = '$media2' WHERE nome_escola = '$nome_escola'";
-        $sql_up_exec = $mysqli->query( $sql_up ) or die("". $mysqli->error);
+        $sql = "SELECT 
+                    AVG($colMedia) AS media, 
+                    AVG($colFreq) AS freq
+                FROM aluno 
+                WHERE nome_escola = '$nome_escola' AND ano = '$anoSistema'";
+        $sql_exec = $mysqli->query($sql);
+        $row = $sql_exec->fetch_assoc();
 
-    }elseif($bimestre['bimestre'] == 3) {
-        $sql = "SELECT AVG(media_3_municipal) AS media_3 FROM aluno WHERE nome_escola = '$nome_escola' ";
-        $sql_exec = $mysqli->query( $sql ) or die("". $mysqli->error);
-        $media = $sql_exec->fetch_assoc();
-        $media3 = $media["media_3"];
+        $mediaFinal = $row["media"];
+        $freqFinal  = $row["freq"];
 
-        $sql_up = "UPDATE escola SET media_total3 = '$media3'";
-        $sql_up_exec = $mysqli->query( $sql_up ) or die("". $mysqli->error);
+        $sql_up = "UPDATE escola 
+                      SET media_total$b = '$mediaFinal',
+                          frequencia_total$b = '$freqFinal'
+                    WHERE nome_escola = '$nome_escola'";
+        $mysqli->query($sql_up);
 
-    }elseif($bimestre['bimestre'] == 4) {
-        $sql = "SELECT AVG(media_4_municipal) AS media_4 FROM aluno WHERE nome_escola = '$nome_escola' ";
-        $sql_exec = $mysqli->query( $sql ) or die("". $mysqli->error);
-        $media = $sql_exec->fetch_assoc();
-        $media4 = $media["media_4"];
+    } elseif ($esfera === "Estadual" || $esfera === "Federal") {
+        // regra estadual/federal
+        $anoSistema     = date('Y');
+        $anoAnterior    = $anoSistema - 1;
+        $anoAnteAnterior = $anoSistema - 2;
 
-        $sql_up = "UPDATE escola SET media_total4 = '$media4' WHERE nome_escola = '$nome_escola'";
-        $sql_up_exec = $mysqli->query( $sql_up ) or die("". $mysqli->error);
+        $colMedia1 = "media_{$b}_medio1";
+        $colMedia2 = "media_{$b}_medio2";
+        $colMedia3 = "media_{$b}_medio3";
+
+        $colFreq1  = "frequencia_{$b}_medio1";
+        $colFreq2  = "frequencia_{$b}_medio2";
+        $colFreq3  = "frequencia_{$b}_medio3";
+
+        $sql = "SELECT 
+                    AVG(
+                        CASE 
+                            WHEN ano_medio = '$anoSistema' THEN $colMedia1
+                            WHEN ano_medio = '$anoAnterior' THEN $colMedia2
+                            WHEN ano_medio = '$anoAnteAnterior' THEN $colMedia3
+                        END
+                    ) AS media,
+                    AVG(
+                        CASE 
+                            WHEN ano_medio = '$anoSistema' THEN $colFreq1
+                            WHEN ano_medio = '$anoAnterior' THEN $colFreq2
+                            WHEN ano_medio = '$anoAnteAnterior' THEN $colFreq3
+                        END
+                    ) AS freq
+                FROM aluno
+                WHERE nome_escola_medio = '$nome_escola' 
+                  AND ano_medio IN ('$anoSistema','$anoAnterior','$anoAnteAnterior')";
+        
+        $sql_exec = $mysqli->query($sql);
+        $row = $sql_exec->fetch_assoc();
+
+        $mediaFinal = $row["media"];
+        $freqFinal  = $row["freq"];
+
+        $sql_up = "UPDATE escola 
+                      SET media_total$b = '$mediaFinal',
+                          frequencia_total$b = '$freqFinal'
+                    WHERE nome_escola = '$nome_escola'";
+        $mysqli->query($sql_up);
     }
 }
 
@@ -58,7 +102,7 @@ while($escola = $sql_escolas_exec->fetch_assoc()){
 $sql = "SELECT 
             COUNT(*) AS bolsistas,
             AVG(media_total1) AS media_escolar,
-            AVG(frequencia_total) AS frequencia
+            AVG(frequencia_total1) AS frequencia
         FROM escola";
 $res = $mysqli->query($sql);
 if (!$res) die("Erro KPIs: " . $mysqli->error);
@@ -133,81 +177,41 @@ $frequenciaGauge = isset($kpis['frequencia']) ? (float)$kpis['frequencia'] : 0;
         function drawCharts() {
             const dataMedia = google.visualization.arrayToDataTable(<?= json_encode($evolucaoMedia) ?>);
             const optMedia = {
-                legend: {
-                    position: 'bottom'
-                },
+                legend: { position: 'bottom' },
                 curveType: 'function',
                 areaOpacity: 0.25,
                 colors: ['#10b981'],
-                hAxis: {
-                    title: 'Bimestres'
-                },
-                vAxis: {
-                    title: 'Média',
-                    viewWindow: {
-                        min: 0
-                    }
-                },
-                chartArea: {
-                    left: 48,
-                    top: 32,
-                    width: '85%',
-                    height: '65%'
-                },
-                pointSize: 6 
+                hAxis: { title: 'Bimestres' },
+                vAxis: { title: 'Média', viewWindow: { min: 0 } },
+                chartArea: { left: 48, top: 32, width: '85%', height: '65%' },
+                pointSize: 6
             };
             new google.visualization.AreaChart(document.getElementById('chart_media')).draw(dataMedia, optMedia);
 
-
-
-            // Frequência por trimestre
             const dataFreq = google.visualization.arrayToDataTable(<?= json_encode($evolucaoFrequencia) ?>);
             const optFreq = {
-                legend: {
-                    position: 'bottom'
-                },
+                legend: { position: 'bottom' },
                 curveType: 'function',
                 areaOpacity: 0.25,
                 colors: ['#059669'],
-                hAxis: {
-                    title: 'Bimestres'
-                },
-                vAxis: {
-                    title: '% Frequência',
-                    viewWindow: {
-                        min: 0,
-                        max: 100
-                    }
-                },
-                chartArea: {
-                    left: 48,
-                    top: 32,
-                    width: '85%',
-                    height: '65%'
-                },
+                hAxis: { title: 'Bimestres' },
+                vAxis: { title: '% Frequência', viewWindow: { min: 0, max: 100 } },
+                chartArea: { left: 48, top: 32, width: '85%', height: '65%' },
                 pointSize: 6
             };
             new google.visualization.AreaChart(document.getElementById('chart_freq')).draw(dataFreq, optFreq);
 
-            // Gauge
             const dataGauge = google.visualization.arrayToDataTable([
                 ['Label', 'Value'],
                 ['', <?= $frequenciaGauge ?>]
             ]);
-            const formatter = new google.visualization.NumberFormat({
-                suffix: '%'
-            });
+            const formatter = new google.visualization.NumberFormat({ suffix: '%' });
             formatter.format(dataGauge, 1);
             const optGauge = {
-                width: 400,
-                height: 300,
-                max: 100,
-                min: 0,
-                minorTicks: 5,
-                greenFrom: 80,
-                greenTo: 100,
-                redFrom: 0,
-                redTo: 80,
+                width: 400, height: 300,
+                max: 100, min: 0, minorTicks: 5,
+                greenFrom: 80, greenTo: 100,
+                redFrom: 0, redTo: 80,
                 majorTicks: ['0%', '20%', '40%', '60%', '80%', '100%']
             };
             new google.visualization.Gauge(document.getElementById('chart_gauge')).draw(dataGauge, optGauge);
@@ -270,7 +274,6 @@ class="self-end mb-6 text-white text-2xl font-bold cursor-pointer hover:text-red
     </a>
 </div>
 
-
     <main class="m-5">
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:col-span-3">
@@ -311,5 +314,4 @@ class="self-end mb-6 text-white text-2xl font-bold cursor-pointer hover:text-red
         </div>
     </main>
 </body>
-
 </html>

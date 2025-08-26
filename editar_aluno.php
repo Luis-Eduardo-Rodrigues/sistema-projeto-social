@@ -75,6 +75,10 @@
         <h3 class="text-xl font-semibold text-center">Notas e Frequência</h3>
 
         <?php
+            $id_aluno = $_GET['id'];
+            $sql = "SELECT * FROM aluno WHERE id_aluno = '$id_aluno'";
+            $query = $mysqli->query($sql) or die();
+            $aluno = $query->fetch_assoc();        
             $esfera = $aluno['esfera'];
 
             if ($esfera === 'municipal') {

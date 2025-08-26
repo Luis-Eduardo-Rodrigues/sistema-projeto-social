@@ -217,7 +217,7 @@
                        name="<?=$aluno['id_aluno']?>" 
                        class="border border-green-500 rounded-full px-3 py-2 w-24 text-center focus:outline-none" 
                        value="<?= $aluno["media_{$b}_municipal"] ?>" 
-                       placeholder="Média" />
+                       placeholder="Média"/>
             </td>
             <td class="p-4">
                 <input type="text" 

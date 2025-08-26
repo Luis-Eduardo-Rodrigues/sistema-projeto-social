@@ -1,3 +1,19 @@
+<?php
+include("conn.php");
+include("protects.php");
+
+$sql = "SELECT * FROM escola";
+$escolas = mysqli_query($mysqli, $sql);
+
+$id_coord = $_GET['id'];
+$sql = "SELECT * FROM usuario WHERE id_usuario = '$id_coord'";
+$query = $mysqli->query($sql) or die();
+$coord = $query->fetch_assoc();  
+
+$opcescola = $escolas->fetch_assoc();
+
+?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -22,39 +38,35 @@
     </header>
 
     <form action="acoes.php" method="POST" class="max-w-6xl mx-auto bg-white shadow-lg rounded-xl p-12 flex flex-col gap-10">
-        <input type="hidden" name="aluno_id">
+        <input type="hidden" name="id_coordenador" value="<?=$coord['id_usuario'];?>">
 
-        <h2 class="text-3xl font-bold text-center">Adicionar Coordenador</h2>
+        <h2 class="text-3xl font-bold text-center">Editar Coordenador</h2>
 
         <div class="grid grid-cols-2 gap-10">
             <div class="flex flex-col gap-2">
                 <label>Nome:</label>
-                <input class="w-full rounded-md px-4 py-2 border border-gray-400" name="nome_coordernador" required type="text">
+                <input class="w-full rounded-md px-4 py-2 border border-gray-400" value="<?=$coord['nome_usuario'];?>" name="nome_coordernador" required type="text">
             </div>
             <div class="flex flex-col gap-2">
                 <label>CPF:</label>
-                <input class="w-full rounded-md px-4 py-2 border border-gray-400" name="cpf_coordernador" required type="text">
+                <input class="w-full rounded-md px-4 py-2 border border-gray-400" value="<?=$coord['cpf'];?>" name="cpf_coordernador" required type="text">
             </div>
             <div class="flex flex-col gap-2">
                 <label>Usuário:</label>
-                <input class="w-full rounded-md px-4 py-2 border border-gray-400" name="usuario_coordernador" required type="text">
+                <input class="w-full rounded-md px-4 py-2 border border-gray-400" value="<?=$coord['usuario'];?>" name="usuario_coordernador" required type="text">
             </div>
             <div class="flex flex-col gap-2">
-                <label>Senha Antiga:</label>
-                <input class="w-full rounded-md px-4 py-2 border border-gray-400" name="senhaAntiga_coordernador" required type="password">
-            </div>
-            <div class="flex flex-col gap-2">
-                <label>Nova Senha:</label>
+                <label>Senha:</label>
                 <input class="w-full rounded-md px-4 py-2 border border-gray-400" name="senha_coordernador" required type="password">
             </div>
             <div class="flex flex-col gap-2 col-span-2">
                 <label>Escola:</label>
                 <select name="escola" id="escola" class="w-full px-4 py-2 rounded-md border border-gray-400">
-                    <option selected value="<?=$aluno['nome_escola'];?>"><?=$aluno['nome_escola'];?></option>
+                    <option selected value="<?=$opcescola['nome_escola'];?>"><?=$opcescola['nome_escola'];?></option>
                     <?php
-                        $sql = "SELECT * FROM escola";
-                        $escolas = mysqli_query($mysqli, $sql);
-                        foreach($escolas as $escola){
+                        
+
+                        while($escola = $escolas->fetch_assoc()){
                     ?>
                         <option value="<?=$escola['nome_escola']?>"><?=$escola['nome_escola']?></option>
                     <?php } ?>

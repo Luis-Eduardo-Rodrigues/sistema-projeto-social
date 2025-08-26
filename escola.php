@@ -6,7 +6,7 @@ include("protects.php");
     if($_SESSION['msgupescola'] != ""){
         echo "<script>alert('{$_SESSION['msgupescola']}')</script>";
         $_SESSION['msgupescola'] = "";
-    }
+    }   
 }
    if(isset($_SESSION['msgescola'])){
     if($_SESSION['msgescola'] != ""){

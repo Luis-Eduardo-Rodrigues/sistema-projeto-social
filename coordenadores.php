@@ -1,4 +1,43 @@
+<?php
+include("conn.php");
+include("protects.php");
 
+    if(isset($_SESSION['msgupescola'])){
+    if($_SESSION['msgupescola'] != ""){
+        echo "<script>alert('{$_SESSION['msgupescola']}')</script>";
+        $_SESSION['msgupescola'] = "";
+    }
+}
+   if(isset($_SESSION['msgescola'])){
+    if($_SESSION['msgescola'] != ""){
+        echo "<script>alert('{$_SESSION['msgescola']}')</script>";
+        $_SESSION['msgescola'] = "";
+    }
+}
+
+    $query_count_coord = "SELECT COUNT(*) FROM usuario WHERE cargo = 'Coordenador'";
+    $query_count_coord_exec = $mysqli->query($query_count_coord) or die($mysqli->error);
+    $sql_count_coord = $query_count_coord_exec->fetch_assoc();
+    $count_coord = $sql_count_coord['COUNT(*)'];
+
+    $pagina = 0;
+    
+    if(!isset($_GET['pagina'])){
+        $pagina = 1;
+    }else{
+        $pagina = $_GET['pagina'] ? intval($_GET['pagina']) : 1;
+    }
+    
+    $limit = 10;
+    $offset = ($pagina - 1) * $limit;
+
+    $numero_pagina = ceil($count_coord / $limit);
+
+
+    $query_coord = "SELECT * FROM usuario WHERE cargo = 'Coordenador' ORDER BY nome_usuario ASC LIMIT {$limit} OFFSET {$offset}";
+    $query_coord_exec = $mysqli->query($query_coord) or die($mysqli->error);
+    
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -35,25 +74,23 @@
                                 <th class="p-4 text-left">CPF</th>
                                 <th class="p-4 text-left">ESCOLA</th>
                                 <th class="p-4 text-left">USUÁRIO</th>
-                                <th class="p-4 text-left">ESFERA</th>
                                 <th class="p-4 text-left">AÇÕES</th>
                             </tr>
                         </thead>
                         
                         <tbody>
                             <?php
-                                while ($aluno = $query_alunos_exec->fetch_assoc()) {
+                                while ($coord = $query_coord_exec->fetch_assoc()) {
                                     
                                 
                             ?>
                             <tr class="border-b hover:bg-green-50">
-                                <td class="p-4 cursor-pointer"><?= $aluno['nome_usuario'] ?></td>
-                                <td class="p-4"><?= $aluno['cpf'] ?></td>
-                                <td class="p-4"><?= $aluno['nome_escola'] ?></td>
-                                <td class="p-4"><?= $aluno['usuario'] ?></td>
-                                <td class="p-4"><?= $aluno['esfera'] ?></td>
+                                <td class="p-4 cursor-pointer"><?= $coord['nome_usuario'] ?></td>
+                                <td class="p-4"><?= $coord['cpf'] ?></td>
+                                <td class="p-4"><?= $coord['nome_escola'] ?></td>
+                                <td class="p-4"><?= $coord['usuario'] ?></td>
                                 <td class="display-flex p-4">
-                                    <button class="bg-[#edd542] hover:bg-yellow-600 text-black font-bold px-4 py-2 p-6 rounded cursor-pointer">Editar</button>
+                                    <a href="editar_coordenador.php?id=<?=$coord['id_usuario']?>" class="bg-[#edd542] hover:bg-yellow-600 text-black font-bold px-4 py-2 p-6 rounded cursor-pointer">Editar</button>
                                     <button class="bg-[#cc3732] hover:bg-red-700 text-black font-bold px-4 py-2 p-6 rounded cursor-pointer">Excluir</button>
                                 </td>
                             </tr>
@@ -74,7 +111,7 @@
             </div>
             
             <div class="fixed bottom-0 left-0 w-full p-6 text-end">
-                <button class="position:fixed bg-[#4bac72] hover:bg-green-700 text-black font-bold px-4 py-2 rounded cursor-pointer">Adicionar Coordenador</button>
+                <a href="adicionar_coordenador.php" class="position:fixed bg-[#4bac72] hover:bg-green-700 text-black font-bold px-4 py-2 rounded cursor-pointer">Adicionar Coordenador</a>
                 <button class="position:fixed bg-[#edd542] hover:bg-yellow-700 text-black font-bold px-4 py-2 rounded cursor-pointer">Salvar</button>
             </div>
 
