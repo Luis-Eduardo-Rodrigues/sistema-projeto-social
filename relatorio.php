@@ -22,11 +22,7 @@ include "conn.php";
 
     <main class="container mx-auto px-6 py-10">
         <form action="gerar_pdf.php" method="POST" class="space-y-8">
-
-            <!-- Grid principal com 2 colunas -->
             <div class="grid grid-cols-2 gap-8">
-
-                <!-- OPÇÕES DE ENSINO E SÉRIE -->
                 <section class="bg-white border border-[#2CA965] rounded-xl p-6 shadow">
                     <h2 class="text-lg font-bold mb-4">Opções de Ensino e Série</h2>
                     <div class="grid grid-cols-2 gap-6">
@@ -60,8 +56,6 @@ include "conn.php";
                         </div>
                     </div>
                 </section>
-
-                <!-- ESCOLAS (SELECT) -->
                 <section class="bg-white border border-[#2CA965] rounded-xl p-6 shadow">
                     <h2 class="text-lg font-bold mb-4">Escolas</h2>
                     <select name="escola" class="w-full border rounded-lg p-2">
@@ -72,11 +66,9 @@ include "conn.php";
                     </select>
                 </section>
 
-                <!-- MÉDIAS (Notas) -->
                 <section class="bg-white border border-[#2CA965] rounded-xl p-6 shadow">
                     <h2 class="text-lg font-bold mb-4">Médias (Notas)</h2>
                     
-                    <!-- Bimestres -->
                     <div class="mb-4">
                         <h3 class="font-semibold mb-2">Bimestres</h3>
                         <div class="grid grid-cols-2 gap-2">
@@ -92,32 +84,10 @@ include "conn.php";
                             </label>
                         </div>
                     </div>
-
-                    <!-- Classificação -->
-                    <div>
-                        <h3 class="font-semibold mb-2">Meta</h3>
-                        <div class="grid grid-cols-1 gap-2">
-                            <label class="flex items-center gap-2">
-                                <input type="radio" name="meta_media" value="acima" class="accent-[#FDC901]">
-                                Acima da Meta
-                            </label>
-                            <label class="flex items-center gap-2">
-                                <input type="radio" name="meta_media" value="abaixo" class="accent-[#FDC901]">
-                                Abaixo da Meta
-                            </label>
-                            <label class="flex items-center gap-2">
-                                <input type="radio" name="meta_media" value="todos" class="accent-[#FDC901]">
-                                Todos
-                            </label>
-                        </div>
-                    </div>
                 </section>
 
-                <!-- FREQUÊNCIA -->
                 <section class="bg-white border border-[#2CA965] rounded-xl p-6 shadow">
                     <h2 class="text-lg font-bold mb-4">Frequência</h2>
-                    
-                    <!-- Bimestres -->
                     <div class="mb-4">
                         <h3 class="font-semibold mb-2">Bimestres</h3>
                         <div class="grid grid-cols-2 gap-2">
@@ -133,28 +103,8 @@ include "conn.php";
                             </label>
                         </div>
                     </div>
-
-                    <!-- Classificação -->
-                    <div>
-                        <h3 class="font-semibold mb-2">Meta</h3>
-                        <div class="grid grid-cols-1 gap-2">
-                            <label class="flex items-center gap-2">
-                                <input type="radio" name="meta_frequencia" value="acima" class="accent-[#FDC901]">
-                                Acima da Meta
-                            </label>
-                            <label class="flex items-center gap-2">
-                                <input type="radio" name="meta_frequencia" value="abaixo" class="accent-[#FDC901]">
-                                Abaixo da Meta
-                            </label>
-                            <label class="flex items-center gap-2">
-                                <input type="radio" name="meta_frequencia" value="todos" class="accent-[#FDC901]">
-                                Todos
-                            </label>
-                        </div>
-                    </div>
                 </section>
 
-                <!-- PAGAMENTOS -->
                 <section class="bg-white border border-[#2CA965] rounded-xl p-6 shadow">
                     <h2 class="text-lg font-bold mb-4">Pagamentos</h2>
                     <label class="flex items-center gap-2">
@@ -163,7 +113,6 @@ include "conn.php";
                     </label>
                 </section>
 
-                <!-- ANOS (SELECT) -->
                 <section class="bg-white border border-[#2CA965] rounded-xl p-6 shadow">
                     <h2 class="text-lg font-bold mb-4">Ano</h2>
                     <select name="ano" class="w-full border rounded-lg p-2">
@@ -176,7 +125,6 @@ include "conn.php";
 
             </div>
 
-            <!-- BOTÕES -->
             <div class="flex justify-between items-center">
                 <a href="index.php" class="bg-gray-300 hover:bg-gray-400 text-black font-bold px-6 py-2 rounded-lg shadow">
                     <i class="fa-solid fa-arrow-left"></i> Voltar
