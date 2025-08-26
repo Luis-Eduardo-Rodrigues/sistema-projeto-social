@@ -1,6 +1,14 @@
 <?php
     include('conn.php');
     include('protects.php');
+
+    $id_escola = $_GET['id'];
+
+    $sql = "SELECT * FROM escola WHERE id_escola = '$id_escola'";
+    $dados_escola = mysqli_query( $mysqli , $sql ) or die(mysqli_error($con));
+    $escola = $dados_escola->fetch_assoc();
+
+
 ?>
 
 <!DOCTYPE html>
@@ -28,34 +36,25 @@
     </header>
 
     <form action="acoes.php" method="POST" class="max-w-6xl mx-auto bg-white shadow-lg rounded-xl p-12 flex flex-col gap-10">
-        <input type="hidden" name="aluno_id">
+        <input type="hidden" name="id_escola" value="<?=$escola['id_escola'];?>">
 
         <h2 class="text-3xl font-bold text-center">Editar Escola</h2>
-
+        
         <div class="grid grid-cols-2 gap-10">
             <div class="flex flex-col gap-2">
                 <label>Nome:</label>
-                <input class="w-full rounded-md px-4 py-2 border border-gray-400" name="nome_escola" type="text" required>
+                <input class="w-full rounded-md px-4 py-2 border border-gray-400" name="nome_escola" type="text" required value="<?=$escola['nome_escola']?>">
             </div>
-            <div class="flex flex-col gap-2">
+            <div class="flex flex-col gap-2">   
                 <label>Endereço:</label>
-                <input class="w-full rounded-md px-4 py-2 border border-gray-400" name="endereco_escola" type="text" required>
-            </div>
-            <div class="flex flex-col gap-2">
-                <label>Esfera:</label>
-                <select name="escola" id="escola" class="w-full px-4 py-2 rounded-md border border-gray-400">
-                    <option selected value="Selecione a esfera"></option>
-                    <option value="Municipal">Municipal</option>
-                    <option value="Estadual">Estadual</option>
-                    <option value="Federal">Federal</option>
-                </select>
+                <input class="w-full rounded-md px-4 py-2 border border-gray-400" name="endereco_escola" type="text" required value="<?=$escola['endereco_escola']?>">
             </div>
         </div>
 
         <div class="flex items-center justify-center gap-6 mt-6">
-            <button type="submit" name="adicionar_aluno" class="px-6 py-3 rounded-md bg-green-700 hover:bg-green-800 text-white font-bold">Salvar</button>
+            <button type="submit" name="update_escola" class="px-6 py-3 rounded-md bg-green-700 hover:bg-green-800 text-white font-bold">Salvar</button>
             <a href="secretaria.php" class="px-6 py-3 rounded-md bg-red-700 hover:bg-red-800 text-white font-bold">Voltar</a>
-        </div>
+        </div>        
     </form>
 </body>
 </html>

@@ -2,6 +2,19 @@
 include("conn.php");
 include("protects.php");
 
+    if(isset($_SESSION['msgupescola'])){
+    if($_SESSION['msgupescola'] != ""){
+        echo "<script>alert('{$_SESSION['msgupescola']}')</script>";
+        $_SESSION['msgupescola'] = "";
+    }
+}
+   if(isset($_SESSION['msgescola'])){
+    if($_SESSION['msgescola'] != ""){
+        echo "<script>alert('{$_SESSION['msgescola']}')</script>";
+        $_SESSION['msgescola'] = "";
+    }
+}
+
     $query_count_escola = "SELECT COUNT(*) FROM escola";
     $query_count_escola_exec = $mysqli->query($query_count_escola) or die($mysqli->error);
     $sql_count_escola = $query_count_escola_exec->fetch_assoc();
@@ -74,8 +87,10 @@ include("protects.php");
                                 <td class="p-4"><?= $escola['esfera'] ?></td>
                                 <td class="p-4 text-center"><?= $escola['qtd_alunos'] ?></td>
                                 <td class="display-flex p-4">
-                                    <button class="bg-[#edd542] hover:bg-yellow-600 text-black font-bold px-4 py-2 p-6 rounded cursor-pointer">Editar</button>
-                                    <button class="bg-[#cc3732] hover:bg-red-700 text-black font-bold px-4 py-2 p-6 rounded cursor-pointer">Excluir</button>
+                                    <a href="editar_escola.php?id=<?=$escola['id_escola']?>" class="bg-[#edd542] hover:bg-yellow-600 text-black font-bold px-4 py-2 p-6 rounded cursor-pointer">Editar</a>
+                                    <form action="acoes.php" method="post" >
+                                        <button onclick="return confirm('Deseja realmente exluir?')" type="submit" name="delete_escola" class="bg-[#cc3732] hover:bg-red-700 text-black font-bold px-4 py-2 p-6 rounded cursor-pointer" value="<?=$escola['id_escola'];?>">Excluir</button>
+                                    </form>
                                 </td>
                             </tr>
                             <?php

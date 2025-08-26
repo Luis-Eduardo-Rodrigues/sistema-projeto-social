@@ -72,45 +72,68 @@
             </div>
         </div>
 
-        <h3 class="text-xl font-semibold text-center">Médias</h3>
-        <div class="grid grid-cols-4 gap-6">
-            <div class="flex flex-col gap-2">
-                <label>Média 1:</label>
-                <input class="rounded-md px-4 py-2 border border-gray-400" value="<?= $aluno['media_1'] ?>" name="media_1" type="text">
-            </div>
-            <div class="flex flex-col gap-2">
-                <label>Média 2:</label>
-                <input class="rounded-md px-4 py-2 border border-gray-400" value="<?= $aluno['media_2'] ?>" name="media_2" type="text">
-            </div>
-            <div class="flex flex-col gap-2">
-                <label>Média 3:</label>
-                <input class="rounded-md px-4 py-2 border border-gray-400" value="<?= $aluno['media_3'] ?>" name="media_3" type="text">
-            </div>
-            <div class="flex flex-col gap-2">
-                <label>Média 4:</label>
-                <input class="rounded-md px-4 py-2 border border-gray-400" value="<?= $aluno['media_4'] ?>" name="media_4" type="text">
-            </div>
-        </div>
+        <h3 class="text-xl font-semibold text-center">Notas e Frequência</h3>
 
-        <h3 class="text-xl font-semibold text-center">Frequência</h3>
-        <div class="grid grid-cols-4 gap-6">
-            <div class="flex flex-col gap-2">
-                <label>Frequência 1:</label>
-                <input class="rounded-md px-4 py-2 border border-gray-400" value="<?= $aluno['frequencia_1'] ?>" name="frequencia_1" type="text">
-            </div>
-            <div class="flex flex-col gap-2">
-                <label>Frequência 2:</label>
-                <input class="rounded-md px-4 py-2 border border-gray-400" value="<?= $aluno['frequencia_2'] ?>" name="frequencia_2" type="text">
-            </div>
-            <div class="flex flex-col gap-2">
-                <label>Frequência 3:</label>
-                <input class="rounded-md px-4 py-2 border border-gray-400" value="<?= $aluno['frequencia_3'] ?>" name="frequencia_3" type="text">
-            </div>
-            <div class="flex flex-col gap-2">
-                <label>Frequência 4:</label>
-                <input class="rounded-md px-4 py-2 border border-gray-400" value="<?= $aluno['frequencia_4'] ?>" name="frequencia_4" type="text">
-            </div>
-        </div>
+        <?php
+            $esfera = $aluno['esfera'];
+
+            if ($esfera === 'municipal') {
+                // MUNICIPAL: 4 médias + 4 frequências
+                echo '<div class="grid grid-cols-4 gap-6">';
+                for ($i = 1; $i <= 4; $i++) {
+                    echo '
+                    <div class="flex flex-col gap-2">
+                        <label>Média '.$i.':</label>
+                        <input class="rounded-md px-4 py-2 border border-gray-400" 
+                               value="'.$aluno['media_'.$i.'_municipal'].'" 
+                               name="media_'.$i.'_municipal" type="text">
+                    </div>';
+                }
+                for ($i = 1; $i <= 4; $i++) {
+                    echo '
+                    <div class="flex flex-col gap-2">
+                        <label>Frequência '.$i.':</label>
+                        <input class="rounded-md px-4 py-2 border border-gray-400" 
+                               value="'.$aluno['frequencia_'.$i.'_municipal'].'" 
+                               name="frequencia_'.$i.'_municipal" type="text">
+                    </div>';
+                }
+                echo '</div>';
+
+            } else {
+                // ESTADUAL ou FEDERAL: 3 séries (cada uma com 8 campos)
+                echo '<div class="grid grid-cols-4 gap-6">';
+                
+                for ($serie = 1; $serie <= 3; $serie++) {
+                    echo "<h4 class='col-span-4 text-lg font-semibold mt-4'>Série $serie</h4>";
+                    
+                    // Médias
+                    for ($i = 1; $i <= 4; $i++) {
+                        $col = "media_{$i}_medio{$serie}";
+                        echo '
+                        <div class="flex flex-col gap-2">
+                            <label>Média '.$i.' ('.$serie.'º):</label>
+                            <input class="rounded-md px-4 py-2 border border-gray-400" 
+                                   value="'.$aluno[$col].'" 
+                                   name="'.$col.'" type="text">
+                        </div>';
+                    }
+                    
+                    // Frequências
+                    for ($i = 1; $i <= 4; $i++) {
+                        $col = "frequencia_{$i}_medio{$serie}";
+                        echo '
+                        <div class="flex flex-col gap-2">
+                            <label>Frequência '.$i.' ('.$serie.'º):</label>
+                            <input class="rounded-md px-4 py-2 border border-gray-400" 
+                                   value="'.$aluno[$col].'" 
+                                   name="'.$col.'" type="text">
+                        </div>';
+                    }
+                }
+                echo '</div>';
+            }
+        ?>
 
         <div class="flex items-center justify-center gap-6 mt-6">
             <button type="submit" name="update_aluno" class="px-6 py-3 rounded-md bg-green-700 hover:bg-green-800 text-white font-bold">Salvar</button>
