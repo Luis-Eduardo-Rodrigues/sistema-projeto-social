@@ -140,7 +140,7 @@ if(isset($_POST['delete_aluno'])){
 
 }
 
-if(isset($_POST['adicionar_aluno'])) {
+if (isset($_POST['adicionar_aluno'])) {
     $nome_aluno     = trim($_POST['nome_aluno'] ?? '');
     $cpf_aluno      = trim($_POST['cpf_aluno'] ?? '');
     $codigo_tecnico = trim($_POST['codigo_tecnico'] ?? '');
@@ -148,14 +148,19 @@ if(isset($_POST['adicionar_aluno'])) {
     $endereco_aluno = trim($_POST['endereco_aluno'] ?? '');
     $ano            = trim($_POST['ano'] ?? '');
 
-    // validações
+    // ----------------- VALIDAÇÕES -----------------
+    if (empty($nome_aluno) || empty($cpf_aluno) || empty($codigo_tecnico) || empty($nome_escola) || empty($ano)) {
+        echo "<script>alert('Erro: Preencha todos os campos.'); window.history.back();</script>";
+        exit;
+    }
+
     if (!preg_match('/^\d{11}$/', $cpf_aluno)) {
         echo "<script>alert('Erro: CPF deve conter exatamente 11 dígitos.'); window.history.back();</script>";
         exit;
     }
 
     if (!preg_match('/^\d{4}$/', $ano)) {
-        echo "<script>alert('Erro: Ano deve estar no formato YYYY (ex.: 2025).'); window.history.back();</script>";
+        echo "<script>alert('Erro: Ano deve estar no formato YYYY.'); window.history.back();</script>";
         exit;
     }
 
@@ -164,80 +169,164 @@ if(isset($_POST['adicionar_aluno'])) {
         exit;
     }
 
-    // valida duplicidade do código técnico
-    $verifica = $mysqli->prepare("SELECT COUNT(*) FROM aluno WHERE codigo_aluno = ?");
-    $verifica->bind_param("s", $codigo_tecnico);
-    $verifica->execute();
-    $verifica->bind_result($count);
-    $verifica->fetch();
-    $verifica->close();
+// ----------------- DUPLICIDADE -----------------
+$stmt = $mysqli->prepare("SELECT COUNT(*) FROM aluno WHERE cpf_aluno = ? OR codigo_aluno = ?");
+$stmt->bind_param("ss", $cpf_aluno, $codigo_tecnico);
+$stmt->execute();
+$stmt->bind_result($count);
+$stmt->fetch();
+$stmt->close();
 
-    if ($count > 0) {
-        echo "<script>alert('Erro: Código Técnico já cadastrado!'); window.history.back();</script>";
-        exit;
-    }
-
-    // consulta esfera da escola escolhida
-    $stmt_escola = $mysqli->prepare("SELECT esfera FROM escola WHERE nome_escola = ?");
-    $stmt_escola->bind_param("s", $nome_escola);
-    $stmt_escola->execute();
-    $stmt_escola->bind_result($esfera_escola);
-    $stmt_escola->fetch();
-    $stmt_escola->close();
-
-    if(!$esfera_escola) {
-        echo "<script>alert('Erro: Escola não encontrada na base de dados.'); window.history.back();</script>";
-        exit;
-    }
-
-    // define valores de acordo com a esfera
-    $esfera_aluno = $esfera_escola;
-    $nome_escola_final = null;
-    $nome_escola_medio = null;
-
-    if(strtolower($esfera_escola) === 'municipal'){
-        $nome_escola_final = $nome_escola;
-    } else {
-        $nome_escola_medio = $nome_escola;
-    }
-
-    // prepara inserção do aluno
-    $stmt = $mysqli->prepare("INSERT INTO aluno 
-        (nome_aluno, cpf_aluno, codigo_aluno, endereco_aluno, ano, esfera, nome_escola, nome_escola_medio) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-
-    if (!$stmt) {
-        echo "<script>alert('Erro ao preparar consulta: " . $mysqli->error . "'); window.history.back();</script>";
-        exit;
-    }
-
-    $stmt->bind_param("ssssssss", 
-        $nome_aluno, 
-        $cpf_aluno, 
-        $codigo_tecnico, 
-        $endereco_aluno, 
-        $ano, 
-        $esfera_aluno, 
-        $nome_escola_final, 
-        $nome_escola_medio
-    );
-
-    if ($stmt->execute()) {
-        // incrementa qtd_alunos na escola escolhida
-        $update_escola = $mysqli->prepare("UPDATE escola SET qtd_alunos = qtd_alunos + 1 WHERE nome_escola = ?");
-        $update_escola->bind_param("s", $nome_escola);
-        $update_escola->execute();
-        $update_escola->close();
-
-        echo "<script>alert('Aluno cadastrado com sucesso!'); window.location.href='adicionar_aluno.php';</script>";
-    } else {
-        if (strpos($stmt->error, 'Duplicate entry') !== false) {
-            echo "<script>alert('Erro: Código Técnico ou CPF já cadastrado!'); window.history.back();</script>";
-        } else {
-            echo "<script>alert('Erro ao cadastrar aluno: " . $stmt->error . "'); window.history.back();</script>";
-        }
-    }
+if ($count > 0) {
+    echo "<script>alert('Erro: CPF ou Código já cadastrado!'); window.history.back();</script>";
+    exit;
 }
+
+// ----------------- CONSULTA ESCOLA -----------------
+$stmt_escola = $mysqli->prepare("SELECT esfera FROM escola WHERE nome_escola = ?");
+$stmt_escola->bind_param("s", $nome_escola);
+$stmt_escola->execute();
+$stmt_escola->bind_result($esfera_escola);
+$stmt_escola->fetch();
+$stmt_escola->close();
+
+if (!$esfera_escola) {
+    echo "<script>alert('Erro: Escola não encontrada.'); window.history.back();</script>";
+    exit;
+}
+
+// ----------------- DEFINIÇÕES POR ESFERA -----------------
+$esfera_escola_lower = strtolower($esfera_escola);
+
+// Zerar notas/frequências municipais e médias
+$media_1_municipal = 0;
+$media_2_municipal = 0;
+$media_3_municipal = 0;
+$media_4_municipal = 0;
+$frequencia_1_municipal = 0;
+$frequencia_2_municipal = 0;
+$frequencia_3_municipal = 0;
+$frequencia_4_municipal = 0;
+
+$media_1_medio1 = 0.0; $media_2_medio1 = 0.0; $media_3_medio1 = 0.0; $media_4_medio1 = 0.0;
+$media_1_medio2 = 0.0; $media_2_medio2 = 0.0; $media_3_medio2 = 0.0; $media_4_medio2 = 0.0;
+$media_1_medio3 = 0.0; $media_2_medio3 = 0.0; $media_3_medio3 = 0.0; $media_4_medio3 = 0.0;
+
+$frequencia_1_medio1 = 0.0; $frequencia_2_medio1 = 0.0; $frequencia_3_medio1 = 0.0; $frequencia_4_medio1 = 0.0;
+$frequencia_1_medio2 = 0.0; $frequencia_2_medio2 = 0.0; $frequencia_3_medio2 = 0.0; $frequencia_4_medio2 = 0.0;
+$frequencia_1_medio3 = 0.0; $frequencia_2_medio3 = 0.0; $frequencia_3_medio3 = 0.0; $frequencia_4_medio3 = 0.0;
+
+// Campos padrão
+$nome_escola_municipal = '';
+$nome_escola_medio = NULL;
+$ano_fundamental = NULL; // Para Municipal
+$ano_medio = NULL;       // Para Estadual/Federal
+$pagamento = NULL;
+$serie = NULL;
+
+// Ajuste conforme esfera
+if ($esfera_escola_lower === 'municipal') {
+    $nome_escola_municipal = $nome_escola;
+    $ano_fundamental = $ano;
+} elseif ($esfera_escola_lower === 'estadual' || $esfera_escola_lower === 'federal') {
+    $nome_escola_municipal = ''; // coluna NOT NULL
+    $nome_escola_medio = $nome_escola;
+    $ano_medio = $ano;
+} else {
+    echo "<script>alert('Erro: Esfera da escola inválida.'); window.history.back();</script>";
+    exit;
+}
+
+// ----------------- INSERÇÃO COM TRANSAÇÃO -----------------
+$mysqli->begin_transaction();
+
+$sql = "INSERT INTO aluno
+    (nome_aluno, cpf_aluno, codigo_aluno, endereco_aluno, nome_escola,
+     media_1_municipal, media_2_municipal, media_3_municipal, media_4_municipal,
+     frequencia_1_municipal, frequencia_2_municipal, frequencia_3_municipal, frequencia_4_municipal,
+     ano,
+     media_1_medio1, media_2_medio1, media_3_medio1, media_4_medio1,
+     media_1_medio2, media_2_medio2, media_3_medio2, media_4_medio2,
+     media_1_medio3, media_2_medio3, media_3_medio3, media_4_medio3,
+     frequencia_1_medio1, frequencia_2_medio1, frequencia_3_medio1, frequencia_4_medio1,
+     frequencia_1_medio2, frequencia_2_medio2, frequencia_3_medio2, frequencia_4_medio2,
+     frequencia_1_medio3, frequencia_2_medio3, frequencia_3_medio3, frequencia_4_medio3,
+     ano_medio, pagamento, nome_escola_medio, esfera, serie)
+    VALUES (?,?,?,?,?,
+            ?,?,?,?,
+            ?,?,?,?,
+            ?,
+            ?,?,?,?,
+            ?,?,?,?,
+            ?,?,?,?,
+            ?,?,?,?,
+            ?,?,?,?,
+            ?,?,?,?,
+            ?,?,?,?,?)";
+
+$stmt_insert = $mysqli->prepare($sql);
+if (!$stmt_insert) {
+    $mysqli->rollback();
+    echo "<script>alert('Erro ao preparar INSERT: ".$mysqli->error."'); window.history.back();</script>";
+    exit;
+}
+
+$stmt_insert->bind_param(
+    "sssss" . "iiiiiiii" . "s" . str_repeat("d", 12) . str_repeat("d", 12) . "siss" . "i",
+    $nome_aluno,
+    $cpf_aluno,
+    $codigo_tecnico,
+    $endereco_aluno,
+    $nome_escola_municipal,
+
+    $media_1_municipal,
+    $media_2_municipal,
+    $media_3_municipal,
+    $media_4_municipal,
+    $frequencia_1_municipal,
+    $frequencia_2_municipal,
+    $frequencia_3_municipal,
+    $frequencia_4_municipal,
+
+    $ano_fundamental, // só tem valor se for municipal
+
+    $media_1_medio1, $media_2_medio1, $media_3_medio1, $media_4_medio1,
+    $media_1_medio2, $media_2_medio2, $media_3_medio2, $media_4_medio2,
+    $media_1_medio3, $media_2_medio3, $media_3_medio3, $media_4_medio3,
+
+    $frequencia_1_medio1, $frequencia_2_medio1, $frequencia_3_medio1, $frequencia_4_medio1,
+    $frequencia_1_medio2, $frequencia_2_medio2, $frequencia_3_medio2, $frequencia_4_medio2,
+    $frequencia_1_medio3, $frequencia_2_medio3, $frequencia_3_medio3, $frequencia_4_medio3,
+
+    $ano_medio, // só tem valor se for estadual/federal
+    $pagamento,
+    $nome_escola_medio,
+    $esfera_escola,
+    $serie
+);
+
+if (!$stmt_insert->execute()) {
+    $err = $stmt_insert->error;
+    $stmt_insert->close();
+    $mysqli->rollback();
+    echo "<script>alert('Erro ao cadastrar aluno: ".htmlspecialchars($err, ENT_QUOTES)."'); window.history.back();</script>";
+    exit;
+}
+$stmt_insert->close();
+
+// Atualiza qtd_alunos
+$stmt_update = $mysqli->prepare("UPDATE escola SET qtd_alunos = IFNULL(qtd_alunos,0) + 1 WHERE nome_escola = ?");
+$stmt_update->bind_param("s", $nome_escola);
+$stmt_update->execute();
+$stmt_update->close();
+
+$mysqli->commit();
+
+echo "<script>alert('Aluno cadastrado com sucesso!'); window.location.href='adicionar_aluno.php';</script>";
+
+
+}
+
 
 if(isset($_POST['adicionar_escola'])) {
     if (isset($_POST['adicionar_escola'])) {
@@ -457,6 +546,62 @@ if(isset($_POST['add_coordenador'])){
     $stmt->close();
     $mysqli->close();
 }
+
+if (isset($_POST['update_coordenador'])) {
+
+    $idcoord    = mysqli_real_escape_string($mysqli, $_POST['id_coordenador']);
+    $nomecoord  = mysqli_real_escape_string($mysqli, trim($_POST['nome_coordernador']));
+    $usuariocoord  = mysqli_real_escape_string($mysqli, trim($_POST['usuario_coordernador']));
+    $cpfcoord   = mysqli_real_escape_string($mysqli, trim($_POST['cpf_coordernador']));
+    $nomeescola = mysqli_real_escape_string($mysqli, $_POST['escola']);
+    $senhacoord = mysqli_real_escape_string($mysqli, trim($_POST['senha_coordernador']));
+
+    $query = "SELECT nome_escola FROM usuario WHERE id_usuario = '$idcoord'";
+    $res   = $mysqli->query($query);
+    $dados = $res->fetch_assoc();
+    $escolaantes = $dados['nome_escola'];
+
+    $sql = "UPDATE usuario 
+    SET nome_usuario = '$nomecoord', cpf = '$cpfcoord', usuario = '$usuariocoord', nome_escola = '$nomeescola'";
+    
+    if (!empty($senhacoord)) {
+        $sql .= ", senha='" . password_hash($senhacoord, PASSWORD_DEFAULT) . "'";
+    }
+    
+    $sql .= " WHERE id_usuario = '$idcoord'";
+    mysqli_query($mysqli, $sql);
+
+    if (mysqli_affected_rows($mysqli) > 0) {
+        $_SESSION["msgupcoord"] = "Coordenador atualizado com sucesso";
+        header('Location: coordenadores.php');
+    } else {
+        $_SESSION["msgupcoord"] = "Nenhuma alteração feita";
+        header('Location: coordenadores.php');
+    }
+}
+
+if(isset($_POST['delete_coord'])){
+    $id_coord = mysqli_real_escape_string($mysqli, $_POST['delete_coord']);
+    $sql = "SELECT nome_escola FROM escola WHERE id_escola = '$id_escola'";
+
+    $query = $mysqli->query($sql) or die("Falha na execução do código SQL: " . $mysqli->error);
+   
+    $sqlDelete = mysqli_query($mysqli, "DELETE FROM usuario WHERE id_usuario = {$id_coord}")
+    or die (mysqli_error($connection));
+
+    if(mysqli_affected_rows($mysqli) > 0){
+        $_SESSION['message_coord'] = "Coordenador deletado";            
+        header('Location: coordenadores.php');
+        exit;
+    }else{
+        $_SESSION['message_coord'] = "Coordenador não deletada";
+        header('Location: coordenadores.php');
+        exit;
+    }
+    
+
+}
+
 
 
 

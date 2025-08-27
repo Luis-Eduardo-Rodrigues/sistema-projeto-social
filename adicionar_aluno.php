@@ -49,6 +49,10 @@
                 <label>Código do Aluno:</label>
                 <input class="w-full rounded-md px-4 py-2 border border-gray-400" name="codigo_tecnico" type="text" pattern="\d{6,10}" minlength="6" maxlength="10" required>
             </div>
+            <div class="flex flex-col gap-2">
+                <label>Endereço Aluno:</label>
+                <input class="w-full rounded-md px-4 py-2 border border-gray-400" name="endereco_aluno" type="text" required>
+            </div>
             <div class="flex flex-col gap-2 col-span-2">
                 <label>Escola:</label>
                 <select name="nome_escola" required id="escola" class="w-full px-4 py-2 rounded-md border border-gray-400">

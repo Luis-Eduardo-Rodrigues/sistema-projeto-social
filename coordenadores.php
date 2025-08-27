@@ -2,19 +2,20 @@
 include("conn.php");
 include("protects.php");
 
-    if(isset($_SESSION['msgupescola'])){
-    if($_SESSION['msgupescola'] != ""){
-        echo "<script>alert('{$_SESSION['msgupescola']}')</script>";
-        $_SESSION['msgupescola'] = "";
+    if(isset($_SESSION['msgupcoord'])){
+        if($_SESSION['msgupcoord'] != ""){
+            echo "<script>alert('{$_SESSION['msgupcoord']}')</script>";
+            $_SESSION['msgupcoord'] = "";
+        }
     }
-}
-   if(isset($_SESSION['msgescola'])){
-    if($_SESSION['msgescola'] != ""){
-        echo "<script>alert('{$_SESSION['msgescola']}')</script>";
-        $_SESSION['msgescola'] = "";
-    }
-}
 
+    if(isset($_SESSION['message_coord'])){
+        if($_SESSION['message_coord'] != ""){
+            echo "<script>alert('{$_SESSION['message_coord']}')</script>";
+            $_SESSION['message_coord'] = "";
+        }
+    }
+   
     $query_count_coord = "SELECT COUNT(*) FROM usuario WHERE cargo = 'Coordenador'";
     $query_count_coord_exec = $mysqli->query($query_count_coord) or die($mysqli->error);
     $sql_count_coord = $query_count_coord_exec->fetch_assoc();
@@ -74,7 +75,7 @@ include("protects.php");
                                 <th class="p-4 text-left">CPF</th>
                                 <th class="p-4 text-left">ESCOLA</th>
                                 <th class="p-4 text-left">USUÁRIO</th>
-                                <th class="p-4 text-left">AÇÕES</th>
+                                <th class="p-4 text-center">AÇÕES</th>
                             </tr>
                         </thead>
                         
@@ -89,9 +90,11 @@ include("protects.php");
                                 <td class="p-4"><?= $coord['cpf'] ?></td>
                                 <td class="p-4"><?= $coord['nome_escola'] ?></td>
                                 <td class="p-4"><?= $coord['usuario'] ?></td>
-                                <td class="display-flex p-4">
-                                    <a href="editar_coordenador.php?id=<?=$coord['id_usuario']?>" class="bg-[#edd542] hover:bg-yellow-600 text-black font-bold px-4 py-2 p-6 rounded cursor-pointer">Editar</button>
-                                    <button class="bg-[#cc3732] hover:bg-red-700 text-black font-bold px-4 py-2 p-6 rounded cursor-pointer">Excluir</button>
+                                <td class="flex p-4 gap-2">
+                                    <a href="editar_coordenador.php?id=<?=$coord['id_usuario']?>" class="bg-[#edd542] hover:bg-yellow-600 text-black font-bold px-4 py-2 p-6 rounded cursor-pointer">Editar</a>
+                                    <form action="acoes.php" method="post" >
+                                        <button onclick="return confirm('Deseja realmente exluir?')" type="submit" name="delete_coord" class="bg-[#cc3732] hover:bg-red-700 text-black font-bold px-4 py-2 p-6 rounded cursor-pointer" value="<?=$coord['id_usuario'];?>">Excluir</button>
+                                    </form> 
                                 </td>
                             </tr>
                             <?php
@@ -99,22 +102,24 @@ include("protects.php");
                             ?>
                         </tbody>
                     </table>
-                    <div class="flex justify-center gap-2 my-4">
-                        <?php
-                            for($p=1;$p<=$numero_pagina;$p++){
-                                echo "<a class='px-4 py-2 rounded-full border bg-green-800 text-white font-bold' href='?pagina={$p}'>{$p}</a>";
+<div class="flex justify-center gap-2 my-4 relative">
+    <?php
+        for($p=1;$p<=$numero_pagina;$p++){
+            echo "<a class='px-4 py-2 rounded-full border bg-green-800 text-white font-bold hover:bg-green-700 transition' href='?pagina={$p}'>{$p}</a>";
+        } 
+    ?>
+    <div class="absolute bottom-0 right-4 flex gap-3">
+        <a href="adicionar_coordenador.php" 
+           class="bg-[#4bac72] hover:bg-green-700 text-black font-bold px-4 py-2 rounded-lg shadow-md transition">
+           Adicionar Coordenador
+        </a>
+        <a href="secretaria.php" class="bg-[#cc3732] hover:bg-red-600 text-black font-bold px-4 py-2 rounded-lg shadow-md transition">
+           Sair
+        </a>
+    </div>
+</div>
 
-                            } 
-                        ?>
-                    </div>
-                </div>
             </div>
-            
-            <div class="fixed bottom-0 left-0 w-full p-6 text-end">
-                <a href="adicionar_coordenador.php" class="position:fixed bg-[#4bac72] hover:bg-green-700 text-black font-bold px-4 py-2 rounded cursor-pointer">Adicionar Coordenador</a>
-                <button class="position:fixed bg-[#edd542] hover:bg-yellow-700 text-black font-bold px-4 py-2 rounded cursor-pointer">Salvar</button>
-            </div>
-
         </section>
     </main>
 </body>

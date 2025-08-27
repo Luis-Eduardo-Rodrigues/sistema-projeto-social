@@ -57,12 +57,12 @@ $opcescola = $escolas->fetch_assoc();
             </div>
             <div class="flex flex-col gap-2">
                 <label>Senha:</label>
-                <input class="w-full rounded-md px-4 py-2 border border-gray-400" name="senha_coordernador" required type="password">
+                <input class="w-full rounded-md px-4 py-2 border border-gray-400" name="senha_coordernador" type="password">
             </div>
             <div class="flex flex-col gap-2 col-span-2">
                 <label>Escola:</label>
                 <select name="escola" id="escola" class="w-full px-4 py-2 rounded-md border border-gray-400">
-                    <option selected value="<?=$opcescola['nome_escola'];?>"><?=$opcescola['nome_escola'];?></option>
+                    <option selected value="<?=$coord['nome_escola'];?>"><?=$coord['nome_escola'];?></option>
                     <?php
                         
 
@@ -75,7 +75,7 @@ $opcescola = $escolas->fetch_assoc();
         </div>
 
         <div class="flex items-center justify-center gap-6">
-            <button type="submit" name="add_coordenador" class="px-6 py-3 rounded-md bg-green-700 hover:bg-green-800 text-white font-bold">Salvar</button>
+            <button type="submit" name="update_coordenador" class="px-6 py-3 rounded-md bg-green-700 hover:bg-green-800 text-white font-bold">Salvar</button>
             <a href="secretaria.php" class="px-6 py-3 rounded-md bg-red-700 hover:bg-red-800 text-white font-bold">Voltar</a>
         </div>
     </form>

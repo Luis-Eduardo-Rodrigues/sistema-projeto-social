@@ -80,6 +80,7 @@
             $query = $mysqli->query($sql) or die();
             $aluno = $query->fetch_assoc();        
             $esfera = $aluno['esfera'];
+            $esfera = strtolower($esfera);
 
             if ($esfera === 'municipal') {
                 // MUNICIPAL: 4 médias + 4 frequências

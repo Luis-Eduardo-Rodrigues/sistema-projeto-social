@@ -14,23 +14,24 @@ while ($escola = $sql_escolas_exec->fetch_assoc()) {
     // pega esfera da escola
     $sqlEsfera = "SELECT esfera FROM escola WHERE nome_escola = '$nome_escola' LIMIT 1";
     $resEsfera = $mysqli->query($sqlEsfera);
-    $rowEsfera = $resEsfera->fetch_assoc();
+    $rowEsfera = $resEsfera ? $resEsfera->fetch_assoc() : null;
     $esfera = $rowEsfera ? $rowEsfera['esfera'] : null;
 
     // pega bimestre do coordenador
     $query_coord = "SELECT bimestre FROM usuario WHERE nome_escola = '$nome_escola' LIMIT 1";
     $query_coord_exec = $mysqli->query($query_coord);
-    $bimestre = $query_coord_exec->fetch_assoc();
+    $bimestre = $query_coord_exec ? $query_coord_exec->fetch_assoc() : null;
 
     if (!$bimestre || !isset($bimestre['bimestre'])) {
         continue; // sem coordenador → pula a escola
     }
 
     $b = (int)$bimestre['bimestre'];
+    $anoSistema      = date('Y');
+    $anoAnterior     = $anoSistema - 1;
+    $anoAnteAnterior = $anoSistema - 2;
 
     if ($esfera === "Municipal") {
-        // lógica municipal (mesma da sua, corrigida)
-        $anoSistema     = date('Y');
         $colMedia = "media_{$b}_municipal";
         $colFreq  = "frequencia_{$b}_municipal";
 
@@ -38,25 +39,25 @@ while ($escola = $sql_escolas_exec->fetch_assoc()) {
                     AVG($colMedia) AS media, 
                     AVG($colFreq) AS freq
                 FROM aluno 
-                WHERE nome_escola = '$nome_escola' AND ano = '$anoSistema'";
+                WHERE nome_escola = '$nome_escola' 
+                  AND ano = '$anoSistema'";
+
         $sql_exec = $mysqli->query($sql);
-        $row = $sql_exec->fetch_assoc();
+        if ($sql_exec && $sql_exec->num_rows > 0) {
+            $row = $sql_exec->fetch_assoc();
+            $mediaFinal = $row["media"];
+            $freqFinal  = $row["freq"];
 
-        $mediaFinal = $row["media"];
-        $freqFinal  = $row["freq"];
-
-        $sql_up = "UPDATE escola 
-                      SET media_total$b = '$mediaFinal',
-                          frequencia_total$b = '$freqFinal'
-                    WHERE nome_escola = '$nome_escola'";
-        $mysqli->query($sql_up);
+            $sql_up = "UPDATE escola 
+                          SET media_total$b = '$mediaFinal',
+                              frequencia_total$b = '$freqFinal'
+                        WHERE nome_escola = '$nome_escola'";
+            $mysqli->query($sql_up);
+        } else {
+            continue; // sem alunos para essa escola
+        }
 
     } elseif ($esfera === "Estadual" || $esfera === "Federal") {
-        // regra estadual/federal
-        $anoSistema     = date('Y');
-        $anoAnterior    = $anoSistema - 1;
-        $anoAnteAnterior = $anoSistema - 2;
-
         $colMedia1 = "media_{$b}_medio1";
         $colMedia2 = "media_{$b}_medio2";
         $colMedia3 = "media_{$b}_medio3";
@@ -83,18 +84,21 @@ while ($escola = $sql_escolas_exec->fetch_assoc()) {
                 FROM aluno
                 WHERE nome_escola_medio = '$nome_escola' 
                   AND ano_medio IN ('$anoSistema','$anoAnterior','$anoAnteAnterior')";
-        
+
         $sql_exec = $mysqli->query($sql);
-        $row = $sql_exec->fetch_assoc();
+        if ($sql_exec && $sql_exec->num_rows > 0) {
+            $row = $sql_exec->fetch_assoc();
+            $mediaFinal = $row["media"];
+            $freqFinal  = $row["freq"];
 
-        $mediaFinal = $row["media"];
-        $freqFinal  = $row["freq"];
-
-        $sql_up = "UPDATE escola 
-                      SET media_total$b = '$mediaFinal',
-                          frequencia_total$b = '$freqFinal'
-                    WHERE nome_escola = '$nome_escola'";
-        $mysqli->query($sql_up);
+            $sql_up = "UPDATE escola 
+                          SET media_total$b = '$mediaFinal',
+                              frequencia_total$b = '$freqFinal'
+                        WHERE nome_escola = '$nome_escola'";
+            $mysqli->query($sql_up);
+        } else {
+            continue; // sem alunos para essa escola
+        }
     }
 }
 
@@ -108,7 +112,7 @@ $res = $mysqli->query($sql);
 if (!$res) die("Erro KPIs: " . $mysqli->error);
 $kpis = $res->fetch_assoc();
 
-// Evolução das médias por trimestre
+// Evolução das médias por trimestre (Municipal apenas aqui, pode expandir depois p/ Estadual/Federal)
 $evolucaoMedia = [['Trimestre', 'Média']];
 $sql = "SELECT 
             AVG(media_1_municipal) AS m1,
@@ -117,8 +121,7 @@ $sql = "SELECT
             AVG(media_4_municipal) AS m4
         FROM aluno";
 $res = $mysqli->query($sql);
-if (!$res) die("Erro Evolução Média: " . $mysqli->error);
-if ($row = $res->fetch_assoc()) {
+if ($res && $row = $res->fetch_assoc()) {
     $evolucaoMedia[] = ['1', (float)$row['m1']];
     $evolucaoMedia[] = ['2', (float)$row['m2']];
     $evolucaoMedia[] = ['3', (float)$row['m3']];
@@ -134,8 +137,7 @@ $sql = "SELECT
             AVG(frequencia_4_municipal) AS f4
         FROM aluno";
 $res = $mysqli->query($sql);
-if (!$res) die("Erro Evolução Frequência: " . $mysqli->error);
-if ($row = $res->fetch_assoc()) {
+if ($res && $row = $res->fetch_assoc()) {
     $evolucaoFrequencia[] = ['1', (float)$row['f1']];
     $evolucaoFrequencia[] = ['2', (float)$row['f2']];
     $evolucaoFrequencia[] = ['3', (float)$row['f3']];
@@ -145,9 +147,10 @@ if ($row = $res->fetch_assoc()) {
 // Lista de escolas
 $escolas = [];
 $res = $mysqli->query("SELECT nome_escola FROM escola ORDER BY nome_escola");
-if (!$res) die("Erro Escolas: " . $mysqli->error);
-while ($row = $res->fetch_assoc()) {
-    $escolas[] = $row['nome_escola'];
+if ($res) {
+    while ($row = $res->fetch_assoc()) {
+        $escolas[] = $row['nome_escola'];
+    }
 }
 
 // Valor da frequência para o gauge
@@ -163,11 +166,7 @@ $frequenciaGauge = isset($kpis['frequencia']) ? (float)$kpis['frequencia'] : 0;
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" />
     <script src="https://www.gstatic.com/charts/loader.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            font-family: Poppins;
-        }
-    </style>
+    <style>*{font-family:Poppins}</style>
     <script>
         google.charts.load('current', {
             packages: ['corechart', 'gauge', 'geochart']
@@ -244,35 +243,35 @@ $frequenciaGauge = isset($kpis['frequencia']) ? (float)$kpis['frequencia'] : 0;
      class="fixed top-0 right-0 h-full w-64 bg-gradient-to-b from-[#4bac72] via-[#4bac72] to-[#EDD542] 
             shadow-lg transform translate-x-full transition-transform duration-300 flex flex-col p-4 z-50">
 
-    <button onclick="toggleMenu()" 
-class="self-end mb-6 text-white text-2xl font-bold cursor-pointer hover:text-red-500 transition">
-        ✕
-    </button>
+        <button onclick="toggleMenu()" 
+            class="self-end mb-6 text-white text-2xl font-bold cursor-pointer hover:text-red-500 transition">
+            ✕
+        </button>
 
-    <?php
-        $menu = [
-            ['Aluno', '<i class="fa-solid fa-graduation-cap"></i>', 'aluno.php'],
-            ['Escola', '<i class="fa-solid fa-school"></i>', 'escola.php'],
-            ['Coordenador', '<i class="fa-solid fa-user"></i>', 'coordenadores.php'],
-            ['Montar Relatório', '<i class="fa-solid fa-file-lines"></i>', 'relatorio.php'] 
-        ];
+        <?php
+            $menu = [
+                ['Aluno', '<i class="fa-solid fa-graduation-cap"></i>', 'aluno.php'],
+                ['Escola', '<i class="fa-solid fa-school"></i>', 'escola.php'],
+                ['Coordenador', '<i class="fa-solid fa-user"></i>', 'coordenadores.php'],
+                ['Montar Relatório', '<i class="fa-solid fa-file-lines"></i>', 'relatorio.php'] 
+            ];
 
-        foreach ($menu as $item) {
-            echo '<a href="' . $item[2] . '" 
-                     class="flex items-center gap-3 w-full bg-white rounded-lg p-3 mb-3 text-gray-700 font-medium 
-                            hover:bg-green-100 hover:text-green-700 cursor-pointer shadow-sm transition">';
-            echo $item[1];
-            echo '<span>' . $item[0] . '</span>';
-            echo '</a>';
-        }
-    ?>
+            foreach ($menu as $item) {
+                echo '<a href="' . $item[2] . '" 
+                         class="flex items-center gap-3 w-full bg-white rounded-lg p-3 mb-3 text-gray-700 font-medium 
+                                hover:bg-green-100 hover:text-green-700 cursor-pointer shadow-sm transition">';
+                echo $item[1];
+                echo '<span>' . $item[0] . '</span>';
+                echo '</a>';
+            }
+        ?>
 
-    <a href="logout.php" 
-       class="flex justify-center items-center w-full bg-red-600 text-white font-semibold rounded-lg p-3 mt-auto 
-              hover:bg-red-700 cursor-pointer shadow-md transition">
-        <i class="fa-solid fa-right-from-bracket mr-2"></i> Sair
-    </a>
-</div>
+        <a href="logout.php" 
+           class="flex justify-center items-center w-full bg-red-600 text-white font-semibold rounded-lg p-3 mt-auto 
+                  hover:bg-red-700 cursor-pointer shadow-md transition">
+            <i class="fa-solid fa-right-from-bracket mr-2"></i> Sair
+        </a>
+    </div>
 
     <main class="m-5">
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
