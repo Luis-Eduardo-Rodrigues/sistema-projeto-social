@@ -35,14 +35,12 @@ if (isset($_POST['update_aluno'])) {
     $nomeescola   = mysqli_real_escape_string($mysqli, $_POST['escola']);
     $ano          = mysqli_real_escape_string($mysqli, trim($_POST['ano_aluno']));
 
-    // Descobrir a esfera da escola selecionada
     $sqlEsfera = "SELECT esfera FROM escola WHERE nome_escola = '$nomeescola' LIMIT 1";
     $resEsfera = $mysqli->query($sqlEsfera);
     $dadosEsfera = $resEsfera->fetch_assoc();
     $esfera = strtolower($dadosEsfera['esfera']);
 
     if ($esfera === 'municipal') {
-        // Pega os campos MUNICIPAIS
         $med1 = mysqli_real_escape_string($mysqli, trim($_POST['media_1_municipal']));
         $med2 = mysqli_real_escape_string($mysqli, trim($_POST['media_2_municipal']));
         $med3 = mysqli_real_escape_string($mysqli, trim($_POST['media_3_municipal']));
@@ -71,7 +69,6 @@ if (isset($_POST['update_aluno'])) {
         ";
 
     } else {
-        // Pega os campos do ENSINO MÉDIO (3 séries)
         $updates = [];
         for ($serie = 1; $serie <= 3; $serie++) {
             for ($i = 1; $i <= 4; $i++) {

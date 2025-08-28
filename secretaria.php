@@ -276,7 +276,8 @@ $frequenciaGauge = (float)($kpis['frequencia'] ?? 0);
                 ['Aluno', '<i class="fa-solid fa-graduation-cap"></i>', 'aluno.php'],
                 ['Escola', '<i class="fa-solid fa-school"></i>', 'escola.php'],
                 ['Coordenador', '<i class="fa-solid fa-user"></i>', 'coordenadores.php'],
-                ['Montar Relatório', '<i class="fa-solid fa-file-lines"></i>', 'relatorio.php'] 
+                ['Montar Relatório Escola', '<i class="fa-solid fa-file-lines"></i>', 'relatorio_escola.php'],
+                ['Montar Relatório Aluno', '<i class="fa-solid fa-file-lines"></i>', 'relatorio_aluno.php'],
             ];
             foreach ($menu as $item) {
                 echo '<a href="' . $item[2] . '" 

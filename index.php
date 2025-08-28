@@ -4,9 +4,17 @@
  if (isset($_POST['usuario_c']) || isset($_POST['senha_c'])) {
         
         if(strlen($_POST['usuario_c']) == 0){
-            echo "<script> alert('Preencha seu usuário!') </script>";
+            echo "<script>
+                const msg = document.getElementById('errorMsgCoordenador');
+                msg.classList.remove('hidden');
+                msg.innerHTML = `<i class='fa-solid fa-circle-exclamation mr-2'></i>Preencha seu usuário!`;
+            </script>";
         }else if(strlen($_POST['senha_c']) == 0){
-            echo "<script> alert('Preencha sua senha!') </script>";
+            echo "<script>
+                const msg = document.getElementById('errorMsgCoordenador');
+                msg.classList.remove('hidden');
+                msg.innerHTML = `<i class='fa-solid fa-circle-exclamation mr-2'></i>Preencha sua senha!`;
+            </script>";
         }else{
             
             $usuario_c = $mysqli->real_escape_string($_POST['usuario_c']);
@@ -30,16 +38,29 @@
                         $_SESSION['id_usuario'] = $usuario['id_usuario'];
                         header("Location: coordenador.php");
                     }else{
-                        echo "<script> alert('Falha ao logar! Dados incorretos') </script>";
+                        echo "<script>
+                            const msg = document.getElementById('errorMsgCoordenador');
+                            msg.classList.remove('hidden');
+                            msg.innerHTML = `<i class='fa-solid fa-circle-exclamation mr-2'></i>Usuário, senha ou escola incorretos.`;
+                        </script>";
                         session_destroy();
                     } 
 
                 }else{
-                    echo "<script> alert('Falha ao logar! Dados incorretos') </script>";
-                    
+                    echo "<script>
+                        const msg = document.getElementById('errorMsgCoordenador');
+                        msg.classList.remove('hidden');
+                        msg.innerHTML = `<i class='fa-solid fa-circle-exclamation mr-2'></i>Usuário, senha ou escola incorretos.`;
+                    </script>";
+
                 }
             }else{
-                echo "<script> alert('Falha ao logar! Dados incorretos') </script>";
+                echo "<script>
+                    const msg = document.getElementById('errorMsgCoordenador');
+                    msg.classList.remove('hidden');
+                    msg.innerHTML = `<i class='fa-solid fa-circle-exclamation mr-2'></i>Usuário, senha ou escola incorretos.`;
+                </script>";
+
             }
            
         }
@@ -48,9 +69,17 @@
 
 if(isset($_POST['usuario_s']) AND isset($_POST['senha_s'])){
     if(strlen($_POST['usuario_s']) == 0){
-        echo "<script> alert('Preencha o campo de usuário.') </script>";
+        echo "<script>
+            const msg = document.getElementById('errorMsgSecretaria');
+            msg.classList.remove('hidden');
+            msg.innerHTML = `<i class='fa-solid fa-circle-exclamation mr-2'></i>Preencha o campo de usuário.`;
+        </script>";
     }else if(strlen($_POST['senha_s']) == 0){
-        echo "<script>alert('Preencha o campo de senha.')</script>";
+        echo "<script>
+            const msg = document.getElementById('errorMsgSecretaria');
+            msg.classList.remove('hidden');
+            msg.innerHTML = `<i class='fa-solid fa-circle-exclamation mr-2'></i>Preencha o campo de senha.`;
+        </script>";
     } else{
 
         $nome_secretario = $mysqli->real_escape_string($_POST['usuario_s']);
@@ -72,14 +101,20 @@ if(isset($_POST['usuario_s']) AND isset($_POST['senha_s'])){
 
                 header("Location: secretaria.php");
             }else{
-                echo "<script>alert('Usuario ou senha incorretos.')</script>";
+                echo "<script>
+                    const msg = document.getElementById('errorMsgSecretaria');
+                    msg.classList.remove('hidden');
+                    msg.innerHTML = `<i class='fa-solid fa-circle-exclamation mr-2'></i>Usuário ou senha incorretos.`;
+                </script>";
             }
 
         }else{
-            echo "<script> alert('Falha ao logar! Dados incorretos') </script>";
+            echo "<script>
+                const msg = document.getElementById('errorMsgSecretaria');
+                msg.classList.remove('hidden');
+                msg.innerHTML = `<i class='fa-solid fa-circle-exclamation mr-2'></i>Falha ao logar! Dados incorretos.`;
+            </script>";
         }
-
-        
     } 
 }
 ?> 
@@ -93,7 +128,7 @@ if(isset($_POST['usuario_s']) AND isset($_POST['senha_s'])){
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha512-DxV+EoADOkOygM4IR9yXP8Sb2qwgidEmeqAEmDKIOfPRQZOWbXCzLC6vjbZyy0vPisbH2SyW27+ddLVCN+OMzQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             font-family: Poppins
@@ -159,6 +194,7 @@ if(isset($_POST['usuario_s']) AND isset($_POST['senha_s'])){
                     Entrar
                 </button>
             </div>
+            <div id="errorMsgSecretaria" class="hidden text-white bg-red-600 border border-red-800 text-sm font-medium px-4 py-2 rounded-md mx-4 mb-4 flex items-center justify-center gap-2 transition-all duration-300"></div>
         </form>
     </section>
 
@@ -181,25 +217,27 @@ if(isset($_POST['usuario_s']) AND isset($_POST['senha_s'])){
             </div>
 
              <div class=" bg-[#5cd65c] shadow-md p-4">
-                    <select name="escola" id="escola" class="block text-sm text-white mb-1">
-                    <option value="" class="shadow-lg w-full bg-gray-50 border border-white rounded-md">Escolha sua escola</option>
+                    <select name="escola" id="escola" class="block text-sm text-black py-2 px-3 rounded-md w-full">
+                    <option value="">Escolha sua escola</option>
                      <?php
                         $sql = "SELECT * FROM escola";
                         $escolas = mysqli_query($mysqli, $sql);
                         foreach($escolas as $escola){
                     ?>
-                    <option value="<?=$escola['nome_escola']?>" class="shadow-lg text-black w-full bg-gray-50 border border-white rounded-md"><?=$escola['nome_escola']?></option>
+                    <option value="<?=$escola['nome_escola']?>" class="text-black"><?=$escola['nome_escola']?></option>
                     <?php
                         }
                     ?>
                 </select>
-                </div>
+            </div>
 
             <div class="flex items-center justify-center">
                 <button type="submit" class="w-full text-sm bg-[#357950] transition cursor-pointer hover:bg-green-900 px-5 rounded-md p-2 text-white font-bold m-3 border-2 border-[#cfb426] text-lg">
                     Entrar
                 </button>
             </div>
+            <div id="errorMsgCoordenador" class="hidden text-white bg-red-600 border border-red-800 text-sm font-medium px-4 py-2 rounded-md mx-4 mb-4 flex items-center justify-center gap-2 transition-all duration-300"></div>
+
         </form>
     </section>
     <script>
