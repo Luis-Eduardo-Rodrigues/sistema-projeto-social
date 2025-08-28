@@ -28,54 +28,69 @@ if($count){
 }
 
 if(isset($_POST['update_aluno'])){
-
     $idaluno = mysqli_real_escape_string($mysqli,$_POST['aluno_id']);
     $nomealuno = mysqli_real_escape_string($mysqli,trim($_POST['nome_aluno']));
     $cpfaluno = mysqli_real_escape_string($mysqli,trim($_POST['cpf_aluno']));
     $codigoaluno = mysqli_real_escape_string($mysqli,trim($_POST['codigo_aluno']));
     $nomeescola = mysqli_real_escape_string($mysqli,$_POST['escola']);
-    $med1 = mysqli_real_escape_string($mysqli,trim($_POST['media_1']));
-    $med2 = mysqli_real_escape_string($mysqli,trim($_POST['media_2']));
-    $med3 = mysqli_real_escape_string($mysqli,trim($_POST['media_3']));
-    $med4 = mysqli_real_escape_string($mysqli,trim($_POST['media_4']));
-    $f1 = mysqli_real_escape_string($mysqli,trim($_POST['frequencia_1']));
-    $f2 = mysqli_real_escape_string($mysqli,trim($_POST['frequencia_2']));
-    $f3 = mysqli_real_escape_string($mysqli,trim($_POST['frequencia_3']));
-    $f4 = mysqli_real_escape_string($mysqli,trim($_POST['frequencia_4']));
     $a = mysqli_real_escape_string($mysqli,trim($_POST['ano_aluno']));
 
-    $queryescola = "SELECT nome_escola FROM aluno WHERE id_aluno = '$idaluno'";
-    $queryescolaexec = $mysqli->query($queryescola);
-    $escola = $queryescolaexec->fetch_assoc();
-    $escolaantes = $escola["nome_escola"];
+    // Pega esfera da escola
+    $sqlEscola = "SELECT esfera FROM escola WHERE nome_escola = '$nomeescola'";
+    $resEscola = $mysqli->query($sqlEscola);
+    $dadosEscola = $resEscola->fetch_assoc();
+    $esfera = strtolower($dadosEscola['esfera']);
 
-    if($escolaantes != $nomeescola) {
-        $sql_update =  "UPDATE escola 
-            SET qtd_alunos = qtd_alunos + 1 
-            WHERE nome_escola = '$nomeescola'";
+    $updates = [
+        "nome_aluno = '$nomealuno'",
+        "cpf_aluno = '$cpfaluno'",
+        "codigo_aluno = '$codigoaluno'",
+        "nome_escola = '$nomeescola'",
+        "ano = '$a'"
+    ];
 
-            $mysqli->query($sql_update) or die("Falha na execução do código SQL: " . $mysqli->error);
-
-        $sql_update =  "UPDATE escola 
-            SET qtd_alunos = qtd_alunos - 1 
-            WHERE nome_escola = '$escolaantes'";
-
-            $mysqli->query($sql_update) or die("Falha na execução do código SQL: " . $mysqli->error);
+    if ($esfera === 'municipal') {
+        for ($i=1; $i<=4; $i++) {
+            $med = mysqli_real_escape_string($mysqli,trim($_POST['media_'.$i.'_municipal'] ?? 0));
+            $freq = mysqli_real_escape_string($mysqli,trim($_POST['frequencia_'.$i.'_municipal'] ?? 0));
+            $updates[] = "media_{$i}_municipal = '$med'";
+            $updates[] = "frequencia_{$i}_municipal = '$freq'";
+        }
+        // Se tiver notas do 9º ano
+        if ($a == 9) {
+            for ($i=1; $i<=4; $i++) {
+                $med9 = mysqli_real_escape_string($mysqli,trim($_POST['media9_'.$i] ?? 0));
+                $freq9 = mysqli_real_escape_string($mysqli,trim($_POST['frequencia9_'.$i] ?? 0));
+                $updates[] = "media_{$i}_municipal = '$med9'";
+                $updates[] = "frequencia_{$i}_municipal = '$freq9'";
+            }
+        }
+    } else {
+        // Estadual / Federal
+        for ($serie=1; $serie<=3; $serie++) {
+            for ($i=1; $i<=4; $i++) {
+                $colM = "media_{$i}_medio{$serie}";
+                $colF = "frequencia_{$i}_medio{$serie}";
+                $med = mysqli_real_escape_string($mysqli,trim($_POST[$colM] ?? 0));
+                $freq = mysqli_real_escape_string($mysqli,trim($_POST[$colF] ?? 0));
+                $updates[] = "$colM = '$med'";
+                $updates[] = "$colF = '$freq'";
+            }
+        }
     }
 
-    $queryUpdate = "UPDATE aluno SET nome_aluno = '$nomealuno', cpf_aluno = '$cpfaluno', codigo_aluno = '$codigoaluno', nome_escola = '$nomeescola', media_1 = '$med1', media_2 = '$med2', media_3 = '$med3', media_4 = '$med4', frequencia_1 = '$f1', frequencia_2 = '$f2', frequencia_3 = '$f3', frequencia_4 = '$f4', ano = '$a' WHERE id_aluno = '$idaluno'   " ;
-
+    $queryUpdate = "UPDATE aluno SET ".implode(", ",$updates)." WHERE id_aluno = '$idaluno'";
     $consultaaluno = mysqli_query($mysqli, $queryUpdate);
 
     if(mysqli_affected_rows($mysqli) > 0){
         $_SESSION["msgupaluno"] = "Aluno Atualizado";
-        header('Location: aluno.php');
-    }else{
+    } else {
         $_SESSION["msgupaluno"] = "Aluno não atualizado";
-        header('Location: aluno.php');
     }
-    
+    header('Location: aluno.php');
+    exit;
 }
+
 
 if(isset($_POST['pagamento_aluno'])){
 

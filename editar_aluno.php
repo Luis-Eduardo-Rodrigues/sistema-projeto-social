@@ -12,23 +12,27 @@
     <title>Editar Aluno - Sistema de Controle</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha512-DxV+EoADOkOygM4IR9yXP8Sb2qwgidEmeqAEmDKIOfPRQZOWbXCzLC6vjbZyy0vPisbH2SyW27+ddLVCN+OMzQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            font-family: Poppins, sans-serif;
-        }
+        * { font-family: Poppins, sans-serif; }
     </style>
 </head>
 
 <body class="bg-gray-50">
 
     <?php
-        $id_aluno = $_GET['id'];
-        $sql = "SELECT * FROM aluno WHERE id_aluno = '$id_aluno'";
-        $query = $mysqli->query($sql) or die();
+        $id_aluno = (int) $_GET['id'];
+
+        $sql = "SELECT a.*, e.esfera 
+                FROM aluno a
+                JOIN escola e ON a.nome_escola = e.nome_escola
+                WHERE a.id_aluno = $id_aluno";
+
+        $query = $mysqli->query($sql) or die($mysqli->error);
         $aluno = $query->fetch_assoc();
+
+        $esfera = strtolower($aluno['esfera']); // <- chave para diferenciar
+
     ?>
 
     <header class="mb-8">
@@ -65,9 +69,9 @@
                         $sql = "SELECT * FROM escola";
                         $escolas = mysqli_query($mysqli, $sql);
                         foreach($escolas as $escola){
+                            echo '<option value="'.$escola['nome_escola'].'">'.$escola['nome_escola'].'</option>';
+                        }
                     ?>
-                        <option value="<?=$escola['nome_escola']?>"><?=$escola['nome_escola']?></option>
-                    <?php } ?>
                 </select>
             </div>
         </div>
@@ -75,65 +79,82 @@
         <h3 class="text-xl font-semibold text-center">Notas e Frequência</h3>
 
         <?php
-            $id_aluno = $_GET['id'];
-            $sql = "SELECT * FROM aluno WHERE id_aluno = '$id_aluno'";
-            $query = $mysqli->query($sql) or die();
-            $aluno = $query->fetch_assoc();        
-            $esfera = $aluno['esfera'];
-            $esfera = strtolower($esfera);
+            $esfera = strtolower($aluno['esfera']);
 
             if ($esfera === 'municipal') {
-                // MUNICIPAL: 4 médias + 4 frequências
+                echo "<h4 class='col-span-4 text-lg font-semibold mt-4'>Fundamental</h4>";
                 echo '<div class="grid grid-cols-4 gap-6">';
                 for ($i = 1; $i <= 4; $i++) {
-                    echo '
-                    <div class="flex flex-col gap-2">
-                        <label>Média '.$i.':</label>
-                        <input class="rounded-md px-4 py-2 border border-gray-400" 
-                               value="'.$aluno['media_'.$i.'_municipal'].'" 
-                               name="media_'.$i.'_municipal" type="text">
-                    </div>';
+                    echo '<div class="flex flex-col gap-2">
+                            <label>Média '.$i.':</label>
+                            <input class="rounded-md px-4 py-2 border border-gray-400"
+                                   value="'.$aluno['media_'.$i.'_municipal'].'"
+                                   name="media_'.$i.'_municipal" type="text">
+                          </div>';
                 }
                 for ($i = 1; $i <= 4; $i++) {
-                    echo '
-                    <div class="flex flex-col gap-2">
-                        <label>Frequência '.$i.':</label>
-                        <input class="rounded-md px-4 py-2 border border-gray-400" 
-                               value="'.$aluno['frequencia_'.$i.'_municipal'].'" 
-                               name="frequencia_'.$i.'_municipal" type="text">
-                    </div>';
+                    echo '<div class="flex flex-col gap-2">
+                            <label>Frequência '.$i.':</label>
+                            <input class="rounded-md px-4 py-2 border border-gray-400"
+                                   value="'.$aluno['frequencia_'.$i.'_municipal'].'"
+                                   name="frequencia_'.$i.'_municipal" type="text">
+                          </div>';
                 }
                 echo '</div>';
 
+                // Bloco separado para o 9º ano
+                $temNotas9 = ($aluno['ano'] == 9);
+                for ($i = 1; $i <= 4; $i++) {
+                    if ($aluno['media_'.$i.'_municipal'] != 0 || $aluno['frequencia_'.$i.'_municipal'] != 0) {
+                        $temNotas9 = true;
+                        break;
+                    }
+                }
+
+                if ($temNotas9) {
+                    echo "<h4 class='col-span-4 text-lg font-semibold mt-8 text-blue-700'>Notas e Frequência - 9º Ano</h4>";
+                    echo '<div class="grid grid-cols-4 gap-6">';
+                    for ($i = 1; $i <= 4; $i++) {
+                        echo '<div class="flex flex-col gap-2">
+                                <label>Média '.$i.' (9º):</label>
+                                <input class="rounded-md px-4 py-2 border border-gray-400"
+                                       value="'.$aluno['media_'.$i.'_municipal'].'"
+                                       name="media9_'.$i.'" type="text">
+                              </div>';
+                    }
+                    for ($i = 1; $i <= 4; $i++) {
+                        echo '<div class="flex flex-col gap-2">
+                                <label>Frequência '.$i.' (9º):</label>
+                                <input class="rounded-md px-4 py-2 border border-gray-400"
+                                       value="'.$aluno['frequencia_'.$i.'_municipal'].'"
+                                       name="frequencia9_'.$i.'" type="text">
+                              </div>';
+                    }
+                    echo '</div>';
+                }
+
             } else {
-                // ESTADUAL ou FEDERAL: 3 séries (cada uma com 8 campos)
+                // ESTADUAL / FEDERAL
                 echo '<div class="grid grid-cols-4 gap-6">';
-                
                 for ($serie = 1; $serie <= 3; $serie++) {
-                    echo "<h4 class='col-span-4 text-lg font-semibold mt-4'>Série $serie</h4>";
-                    
-                    // Médias
+                    echo "<h4 class='col-span-4 text-lg font-semibold mt-4'>".$serie."º Série</h4>";
                     for ($i = 1; $i <= 4; $i++) {
                         $col = "media_{$i}_medio{$serie}";
-                        echo '
-                        <div class="flex flex-col gap-2">
-                            <label>Média '.$i.' ('.$serie.'º):</label>
-                            <input class="rounded-md px-4 py-2 border border-gray-400" 
-                                   value="'.$aluno[$col].'" 
-                                   name="'.$col.'" type="text">
-                        </div>';
+                        echo '<div class="flex flex-col gap-2">
+                                <label>Média '.$i.' ('.$serie.'º):</label>
+                                <input class="rounded-md px-4 py-2 border border-gray-400"
+                                       value="'.$aluno[$col].'"
+                                       name="'.$col.'" type="text">
+                              </div>';
                     }
-                    
-                    // Frequências
                     for ($i = 1; $i <= 4; $i++) {
                         $col = "frequencia_{$i}_medio{$serie}";
-                        echo '
-                        <div class="flex flex-col gap-2">
-                            <label>Frequência '.$i.' ('.$serie.'º):</label>
-                            <input class="rounded-md px-4 py-2 border border-gray-400" 
-                                   value="'.$aluno[$col].'" 
-                                   name="'.$col.'" type="text">
-                        </div>';
+                        echo '<div class="flex flex-col gap-2">
+                                <label>Frequência '.$i.' ('.$serie.'º):</label>
+                                <input class="rounded-md px-4 py-2 border border-gray-400"
+                                       value="'.$aluno[$col].'"
+                                       name="'.$col.'" type="text">
+                              </div>';
                     }
                 }
                 echo '</div>';
