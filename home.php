@@ -36,8 +36,6 @@
         </a>
     </header>
 
-
-
     <!-- Carrossel -->
     <section class="container mx-auto px-4 py-8">
         <div class="swiper">
@@ -59,10 +57,8 @@
                                 Nossa maior meta é <span class="font-semibold">combater a evasão escolar</span>, ajudar os alunos a permanecerem na escola e fomentar a <span class="font-semibold">conclusão dos estudos</span>.
                             </p>
                         </div>
-
                     </div>
                 </div>
-
 
                 <div class="swiper-slide flex justify-center">
                     <div class="bg-white shadow rounded-xl p-6 border border-gray-200 max-w-2xl mx-auto text-left">
@@ -82,7 +78,6 @@
                         </div>
                     </div>
                 </div>
-
 
                 <div class="swiper-slide">
                     <div class="bg-white shadow rounded-xl p-6 border border-gray-200 max-w-2xl mx-auto text-left">
@@ -105,18 +100,12 @@
 
                 <div class="swiper-slide">
                     <div class="bg-white shadow rounded-xl p-6 border border-gray-200 max-w-2xl mx-auto text-left">
-
-                        <!-- Título -->
                         <h2 class="text-2xl sm:text-3xl font-extrabold text-[#279E5E] mb-4 leading-snug">
                             Quem pode participar?
                         </h2>
-
-                        <!-- Texto de introdução -->
                         <p class="text-base sm:text-lg text-neutral-700 mb-6">
                             Para receber o benefício, o estudante deve:
                         </p>
-
-                        <!-- Lista de requisitos -->
                         <ul class="space-y-3 text-neutral-800 text-sm sm:text-base mx-auto inline-block text-left">
                             <li class="flex items-center gap-2">
                                 <span class="text-[#279E5E] font-bold">✔</span>
@@ -139,11 +128,8 @@
                                 <span>Concluir o ano com aprovação.</span>
                             </li>
                         </ul>
-
                     </div>
                 </div>
-
-
             </div>
             <div class="swiper-button-prev"></div>
             <div class="swiper-button-next"></div>
@@ -166,7 +152,6 @@
         });
     </script>
 
-
     <section class="container mx-auto px-4 py-8">
         <h2 class="text-2xl font-bold text-center text-[#279E5E] mb-6">
             CALENDÁRIO DE PAGAMENTOS – PÉ DE MEIA MUNICIPAL
@@ -174,6 +159,7 @@
 
         <div class="grid md:grid-cols-2 gap-8">
 
+            <!-- Calendário -->
             <div class="bg-white shadow rounded-xl p-6 border border-gray-200">
                 <div class="flex justify-between mb-4 items-center">
                     <button id="prev" class="px-3 py-1 bg-gray-200 rounded">◀</button>
@@ -183,47 +169,71 @@
                 <div id="calendar-grid" class="grid grid-cols-7 gap-2 text-center text-sm"></div>
             </div>
 
-            <!-- Datas -->
+            <!-- Datas dinâmicas em PHP -->
+            <?php
+            $hoje = new DateTime();
+            $parcelas = [
+                ["texto" => "1ª parcela referente aos meses de Março, Abril e Maio", "mes" => 6],
+                ["texto" => "2ª parcela referente aos meses de Junho e Julho", "mes" => 7],
+                ["texto" => "3ª parcela", "mes" => 8],
+                ["texto" => "4ª parcela", "mes" => 9],
+                ["texto" => "5ª parcela", "mes" => 10],
+                ["texto" => "6ª parcela", "mes" => 11],
+                ["texto" => "7ª parcela", "mes" => 12],
+            ];
+            $nomesMeses = [
+                1 => "Janeiro",
+                2 => "Fevereiro",
+                3 => "Março",
+                4 => "Abril",
+                5 => "Maio",
+                6 => "Junho",
+                7 => "Julho",
+                8 => "Agosto",
+                9 => "Setembro",
+                10 => "Outubro",
+                11 => "Novembro",
+                12 => "Dezembro"
+            ];
+            ?>
             <div class="bg-white shadow rounded-xl p-6 border border-gray-200">
-                <h3 class="text-lg font-semibold text-[#279E5E]">1º semestre</h3>
-                <ul class="list-disc list-inside text-sm mb-6">
-                    <li>1ª parcela: 31/3 a 07/4/25</li>
-                    <li>2ª parcela: 23 a 30/4/25</li>
-                    <li>3ª parcela: 26/5 a 2/6/25</li>
-                    <li>4ª parcela: 23 a 30/6/25</li>
-                    <li>5ª parcela: 28/7 a 4/8/25</li>
-                </ul>
-                <h3 class="text-lg font-semibold text-[#279E5E]">2º semestre</h3>
-                <ul class="list-disc list-inside text-sm">
-                    <li>1ª parcela: 25/8 a 1º/9/25</li>
-                    <li>2ª parcela: 29/9 a 6/10/25</li>
-                    <li>3ª parcela: 27/10 a 3/11/25</li>
-                    <li>4ª parcela: 24/11 a 2/12/25</li>
+                <h3 class="text-lg font-semibold text-[#279E5E] mb-4">Relação de Pagamentos</h3>
+                <ul class="space-y-3 text-sm">
+                    <?php foreach ($parcelas as $parcela):
+                        $ano = $hoje->format("Y");
+                        $inicio = new DateTime("$ano-{$parcela['mes']}-10");
+                        $fim    = new DateTime("$ano-{$parcela['mes']}-15");
+
+                        if ($hoje > $fim) {
+                            $status = "<i class='fa-solid fa-circle-check text-green-600'></i>";
+                        } else {
+                            $status = "<i class='fa-solid fa-circle-xmark text-red-500'></i>";
+                        }
+                    ?>
+                        <li class="flex items-center gap-2">
+                            <?= $status ?>
+                            <span><?= $parcela['texto']; ?>: 10 a 15 de <?= $nomesMeses[$parcela['mes']] ?></span>
+                        </li>
+                    <?php endforeach; ?>
                 </ul>
             </div>
         </div>
     </section>
 
+
     <footer class="w-full flex items-center py-2 justify-around mt-24 border-t-2 border-[#357950]">
-        <div>
-            <img src="./src/logo-caixa.png" class="w-40" alt="Logo da Caixa">
-        </div>
-        <div>
-            <img src="./src/logo-gov.png" class="w-40" alt="Logo do Governo Federal">
-        </div>
-        <div>
-            <img src="./src/logo-estado.png" class="w-40" alt="Logo do Estado">
-        </div>
+        <div><img src="./src/logo-caixa.png" class="w-40" alt="Logo da Caixa"></div>
+        <div><img src="./src/logo-gov.png" class="w-40" alt="Logo do Governo Federal"></div>
+        <div><img src="./src/logo-estado.png" class="w-40" alt="Logo do Estado"></div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
-        let mes = new Date().getMonth(); 
+        let mes = new Date().getMonth();
         let ano = new Date().getFullYear();
 
         const calendarTitle = document.getElementById("calendar-title");
         const calendarGrid = document.getElementById("calendar-grid");
-
         const weekDays = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sab", "Dom"];
 
         function gerarCalendario(diasPagamento) {
@@ -231,25 +241,20 @@
                 month: "long",
                 year: "numeric"
             });
-
             calendarGrid.innerHTML = "";
-
             weekDays.forEach(d => {
                 const div = document.createElement("div");
                 div.textContent = d;
                 div.classList.add("font-bold");
                 calendarGrid.appendChild(div);
             });
-
             const primeiroDiaSemana = new Date(ano, mes, 1).getDay();
             const diasNoMes = new Date(ano, mes + 1, 0).getDate();
             const offset = (primeiroDiaSemana + 6) % 7;
-
             for (let i = 0; i < offset; i++) {
                 const vazio = document.createElement("div");
                 calendarGrid.appendChild(vazio);
             }
-
             for (let d = 1; d <= diasNoMes; d++) {
                 const dia = document.createElement("div");
                 dia.textContent = d;
@@ -269,7 +274,6 @@
             }
             carregarPagamentos();
         });
-
         document.getElementById("next").addEventListener("click", () => {
             mes++;
             if (mes > 11) {
@@ -279,10 +283,7 @@
             carregarPagamentos();
         });
 
-        // ---------- API Simulada ----------
         async function carregarPagamentos() {
-            // Aqui você pode integrar sua API real
-            // Por enquanto, fake: destaca dias 10 e 20 de qualquer mês
             const data = {
                 dias: [10, 11, 12, 13, 14, 15]
             };
@@ -290,7 +291,6 @@
         }
         carregarPagamentos();
     </script>
-
 </body>
 
 </html>
