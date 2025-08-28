@@ -27,69 +27,86 @@ if($count){
 }
 }
 
-if(isset($_POST['update_aluno'])){
-    $idaluno = mysqli_real_escape_string($mysqli,$_POST['aluno_id']);
-    $nomealuno = mysqli_real_escape_string($mysqli,trim($_POST['nome_aluno']));
-    $cpfaluno = mysqli_real_escape_string($mysqli,trim($_POST['cpf_aluno']));
-    $codigoaluno = mysqli_real_escape_string($mysqli,trim($_POST['codigo_aluno']));
-    $nomeescola = mysqli_real_escape_string($mysqli,$_POST['escola']);
-    $a = mysqli_real_escape_string($mysqli,trim($_POST['ano_aluno']));
+if (isset($_POST['update_aluno'])) {
+    $idaluno      = mysqli_real_escape_string($mysqli, $_POST['aluno_id']);
+    $nomealuno    = mysqli_real_escape_string($mysqli, trim($_POST['nome_aluno']));
+    $cpfaluno     = mysqli_real_escape_string($mysqli, trim($_POST['cpf_aluno']));
+    $codigoaluno  = mysqli_real_escape_string($mysqli, trim($_POST['codigo_aluno']));
+    $nomeescola   = mysqli_real_escape_string($mysqli, $_POST['escola']);
+    $ano          = mysqli_real_escape_string($mysqli, trim($_POST['ano_aluno']));
 
-    // Pega esfera da escola
-    $sqlEscola = "SELECT esfera FROM escola WHERE nome_escola = '$nomeescola'";
-    $resEscola = $mysqli->query($sqlEscola);
-    $dadosEscola = $resEscola->fetch_assoc();
-    $esfera = strtolower($dadosEscola['esfera']);
-
-    $updates = [
-        "nome_aluno = '$nomealuno'",
-        "cpf_aluno = '$cpfaluno'",
-        "codigo_aluno = '$codigoaluno'",
-        "nome_escola = '$nomeescola'",
-        "ano = '$a'"
-    ];
+    // Descobrir a esfera da escola selecionada
+    $sqlEsfera = "SELECT esfera FROM escola WHERE nome_escola = '$nomeescola' LIMIT 1";
+    $resEsfera = $mysqli->query($sqlEsfera);
+    $dadosEsfera = $resEsfera->fetch_assoc();
+    $esfera = strtolower($dadosEsfera['esfera']);
 
     if ($esfera === 'municipal') {
-        for ($i=1; $i<=4; $i++) {
-            $med = mysqli_real_escape_string($mysqli,trim($_POST['media_'.$i.'_municipal'] ?? 0));
-            $freq = mysqli_real_escape_string($mysqli,trim($_POST['frequencia_'.$i.'_municipal'] ?? 0));
-            $updates[] = "media_{$i}_municipal = '$med'";
-            $updates[] = "frequencia_{$i}_municipal = '$freq'";
-        }
-        // Se tiver notas do 9º ano
-        if ($a == 9) {
-            for ($i=1; $i<=4; $i++) {
-                $med9 = mysqli_real_escape_string($mysqli,trim($_POST['media9_'.$i] ?? 0));
-                $freq9 = mysqli_real_escape_string($mysqli,trim($_POST['frequencia9_'.$i] ?? 0));
-                $updates[] = "media_{$i}_municipal = '$med9'";
-                $updates[] = "frequencia_{$i}_municipal = '$freq9'";
-            }
-        }
+        // Pega os campos MUNICIPAIS
+        $med1 = mysqli_real_escape_string($mysqli, trim($_POST['media_1_municipal']));
+        $med2 = mysqli_real_escape_string($mysqli, trim($_POST['media_2_municipal']));
+        $med3 = mysqli_real_escape_string($mysqli, trim($_POST['media_3_municipal']));
+        $med4 = mysqli_real_escape_string($mysqli, trim($_POST['media_4_municipal']));
+        $f1   = mysqli_real_escape_string($mysqli, trim($_POST['frequencia_1_municipal']));
+        $f2   = mysqli_real_escape_string($mysqli, trim($_POST['frequencia_2_municipal']));
+        $f3   = mysqli_real_escape_string($mysqli, trim($_POST['frequencia_3_municipal']));
+        $f4   = mysqli_real_escape_string($mysqli, trim($_POST['frequencia_4_municipal']));
+
+        $queryUpdate = "
+            UPDATE aluno SET 
+                nome_aluno = '$nomealuno',
+                cpf_aluno = '$cpfaluno',
+                codigo_aluno = '$codigoaluno',
+                nome_escola = '$nomeescola',
+                ano = '$ano',
+                media_1_municipal = '$med1',
+                media_2_municipal = '$med2',
+                media_3_municipal = '$med3',
+                media_4_municipal = '$med4',
+                frequencia_1_municipal = '$f1',
+                frequencia_2_municipal = '$f2',
+                frequencia_3_municipal = '$f3',
+                frequencia_4_municipal = '$f4'
+            WHERE id_aluno = '$idaluno'
+        ";
+
     } else {
-        // Estadual / Federal
-        for ($serie=1; $serie<=3; $serie++) {
-            for ($i=1; $i<=4; $i++) {
-                $colM = "media_{$i}_medio{$serie}";
-                $colF = "frequencia_{$i}_medio{$serie}";
-                $med = mysqli_real_escape_string($mysqli,trim($_POST[$colM] ?? 0));
-                $freq = mysqli_real_escape_string($mysqli,trim($_POST[$colF] ?? 0));
-                $updates[] = "$colM = '$med'";
-                $updates[] = "$colF = '$freq'";
+        // Pega os campos do ENSINO MÉDIO (3 séries)
+        $updates = [];
+        for ($serie = 1; $serie <= 3; $serie++) {
+            for ($i = 1; $i <= 4; $i++) {
+                $m = mysqli_real_escape_string($mysqli, trim($_POST["media_{$i}_medio{$serie}"] ?? 0));
+                $f = mysqli_real_escape_string($mysqli, trim($_POST["frequencia_{$i}_medio{$serie}"] ?? 0));
+                $updates[] = "media_{$i}_medio{$serie} = '$m'";
+                $updates[] = "frequencia_{$i}_medio{$serie} = '$f'";
             }
         }
+
+        $updatesStr = implode(", ", $updates);
+
+        $queryUpdate = "
+            UPDATE aluno SET 
+                nome_aluno = '$nomealuno',
+                cpf_aluno = '$cpfaluno',
+                codigo_aluno = '$codigoaluno',
+                nome_escola_medio = '$nomeescola',
+                ano = '$ano',
+                $updatesStr
+            WHERE id_aluno = '$idaluno'
+        ";
     }
 
-    $queryUpdate = "UPDATE aluno SET ".implode(", ",$updates)." WHERE id_aluno = '$idaluno'";
     $consultaaluno = mysqli_query($mysqli, $queryUpdate);
 
-    if(mysqli_affected_rows($mysqli) > 0){
+    if (mysqli_affected_rows($mysqli) > 0) {
         $_SESSION["msgupaluno"] = "Aluno Atualizado";
     } else {
         $_SESSION["msgupaluno"] = "Aluno não atualizado";
     }
     header('Location: aluno.php');
-    exit;
 }
+
+
 
 
 if(isset($_POST['pagamento_aluno'])){
