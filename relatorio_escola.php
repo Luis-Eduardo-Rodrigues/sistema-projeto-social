@@ -183,10 +183,11 @@ if (!empty($anos)) rsort($anos);
 
             </div>
 
-            <div class="flex justify-between items-center">
-                <a href="index.php" class="bg-gray-300 hover:bg-gray-400 text-black font-bold px-6 py-2 rounded-lg shadow flex items-center gap-2">
-                    <i class="fa-solid fa-arrow-left"></i> Voltar
-                </a>
+<div class="flex justify-between items-center">
+    <a href="secretaria.php" class="bg-gray-300 hover:bg-gray-400 text-black font-bold px-6 py-2 rounded-lg shadow flex items-center gap-2">
+        <i class="fa-solid fa-arrow-left"></i> Voltar
+    </a>
+
                 <button type="submit" class="bg-[#FDC901] hover:bg-yellow-500 text-black font-bold px-6 py-2 rounded-lg shadow flex items-center gap-2">
                     <i class="fa-solid fa-file-pdf"></i> Gerar PDF
                 </button>
